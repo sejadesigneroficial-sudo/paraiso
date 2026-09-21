@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Paraíso dos Focinhos</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --forest: #1B4332;
+      --forest-mid: #2D6A4F;
+      --green-light: #52B788;
+      --leaf: #D8F3DC;
+      --amber: #F4A228;
+      --amber-dk: #D48810;
+      --coral: #E05C3A;
+      --bg: #EFF5ED;
+      --surface: #FFFFFF;
+      --surface-alt: #F4F9F2;
+      --ink: #1C2822;
+      --muted: #5E7366;
+      --border: #CFE6D3;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --forest: #52B788;
+        --forest-mid: #74C69D;
+        --green-light: #40916C;
+        --leaf: #1B4332;
+        --bg: #0D1F16;
+        --surface: #152A1E;
+        --surface-alt: #1B3526;
+        --ink: #E8F5E9;
+        --muted: #8FBC9F;
+        --border: #2D5A3E;
+      }
+    }
+    :root[data-theme="dark"] {
+      --forest: #52B788;
+      --forest-mid: #74C69D;
+      --green-light: #40916C;
+      --leaf: #1B4332;
+      --bg: #0D1F16;
+      --surface: #152A1E;
+      --surface-alt: #1B3526;
+      --ink: #E8F5E9;
+      --muted: #8FBC9F;
+      --border: #2D5A3E;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* LOGIN */
+    #pg-login {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+    .login-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+    .login-box img { height: 64px; margin-bottom: 20px; mix-blend-mode: multiply; }
+    @media (prefers-color-scheme: dark) { .login-box img { mix-blend-mode: screen; } }
+    .login-box h1 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.4rem;
+      color: var(--forest);
+      margin-bottom: 6px;
+    }
+    .login-box p { color: var(--muted); font-size: .9rem; margin-bottom: 24px; }
+    .login-box input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      background: var(--surface-alt);
+      color: var(--ink);
+      margin-bottom: 14px;
+      outline: none;
+    }
+    .login-box input:focus { border-color: var(--green-light); }
+    .login-box input.invalid { border-color: var(--coral); }
+    .login-box button {
+      width: 100%;
+      padding: 13px;
+      background: var(--forest);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .login-box button:hover { background: var(--forest-mid); }
+    .login-error { color: var(--coral); font-size: .85rem; margin-top: 10px; }
+
+    /* ADMIN */
+    #pg-admin { display: none; }
+    .adm-header {
+      background: var(--forest);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .adm-header img { height: 48px; mix-blend-mode: screen; }
+    .adm-header-title { color: white; font-weight: 600; font-size: 1rem; }
+    .btn-logout {
+      background: rgba(255,255,255,.15);
+      color: white;
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: .85rem;
+      cursor: pointer;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,.25); }
+
+    .adm-body { padding: 28px 24px; max-width: 1100px; margin: 0 auto; }
+
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      flex: 1;
+      min-width: 140px;
+    }
+    .stat-card .stat-num {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 2rem;
+      color: var(--forest);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-card .stat-label { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+
+    .adm-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .adm-toolbar h2 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.2rem;
+      color: var(--forest);
+    }
+    .toolbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-export {
+      padding: 9px 18px;
+      background: var(--forest);
+      color: white;
+      border: none;
+      border-radius: 9px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-export:hover { background: var(--forest-mid); }
+    .btn-clear {
+      padding: 9px 18px;
+      background: transparent;
+      color: var(--coral);
+      border: 1.5px solid var(--coral);
+      border-radius: 9px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-clear:hover { background: #fff0ed; }
+    .btn-atualizar {
+      padding: 9px 18px;
+      background: var(--surface-alt);
+      color: var(--forest);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-atualizar:hover { background: var(--leaf); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--forest);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: .9rem;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      z-index: 999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: transform .3s ease, opacity .3s ease;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    .table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      font-size: .9rem;
+    }
+    thead tr { background: var(--surface-alt); }
+    th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: .78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface-alt); }
+    .badge-animal {
+      display: inline-block;
+      background: var(--leaf);
+      color: var(--forest);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: .78rem;
+      font-weight: 600;
+    }
+    .btn-del {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .btn-del:hover { background: #fde8e4; color: var(--coral); }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--muted);
+    }
+    .empty-state svg { opacity: .3; margin-bottom: 16px; }
+    .empty-state p { font-size: .95rem; }
+
+    @media (max-width: 600px) {
+      .adm-body { padding: 20px 16px; }
+      .stat-card { min-width: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="pg-login">
+  <div class="login-box">
+    <img src="logo.png" alt="Paraíso dos Focinhos">
+    <h1>Painel Administrativo</h1>
+    <p>Acesso restrito — equipe PARAISO DOS FOCINHOS</p>
+    <input type="password" id="inp-senha" placeholder="Senha de acesso" autocomplete="current-password">
+    <button onclick="tentarLogin()">Entrar</button>
+    <p id="login-erro" class="login-error" hidden>Senha incorreta. Tente novamente.</p>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="pg-admin">
+  <header class="adm-header">
+    <img src="logo.png" alt="Paraíso dos Focinhos">
+    <span class="adm-header-title">Painel de Cadastros</span>
+    <button class="btn-logout" onclick="logout()">Sair</button>
+  </header>
+
+  <div class="adm-body">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">Total de cadastros</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-hoje">0</div>
+        <div class="stat-label">Cadastros hoje</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-animal">—</div>
+        <div class="stat-label">Animal mais pedido</div>
+      </div>
+    </div>
+
+    <div class="adm-toolbar">
+      <h2>Cadastros recebidos</h2>
+      <div class="toolbar-actions">
+        <button class="btn-atualizar" id="btn-atualizar" onclick="renderTabela()">↻ Atualizar</button>
+        <button class="btn-export" onclick="exportarCSV()">⬇ Exportar CSV</button>
+        <button class="btn-clear" onclick="limparTudo()">Limpar tudo</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="tabela">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nome</th>
+            <th>Endereço</th>
+            <th>WhatsApp</th>
+            <th>Animal</th>
+            <th>Data/Hora</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="empty-state" class="empty-state" hidden>
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="22" stroke="#52B788" stroke-width="2"/>
+          <path d="M16 24h16M24 16v16" stroke="#52B788" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <p>Nenhum cadastro recebido ainda.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const SENHA = 'paraiso2024';
+  const CHAVE = 'pf_cadastros';
+
+  document.getElementById('inp-senha').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') tentarLogin();
+  });
+
+  function tentarLogin() {
+    const v = document.getElementById('inp-senha').value;
+    if (v === SENHA) {
+      document.getElementById('pg-login').style.display = 'none';
+      document.getElementById('pg-admin').style.display = 'block';
+      renderTabela();
+    } else {
+      document.getElementById('inp-senha').classList.add('invalid');
+      document.getElementById('login-erro').hidden = false;
+    }
+  }
+
+  function logout() {
+    document.getElementById('pg-login').style.display = 'flex';
+    document.getElementById('pg-admin').style.display = 'none';
+    document.getElementById('inp-senha').value = '';
+    document.getElementById('inp-senha').classList.remove('invalid');
+    document.getElementById('login-erro').hidden = true;
+  }
+
+  function getCadastros() {
+    try { return JSON.parse(localStorage.getItem(CHAVE) || '[]'); } catch(e) { return []; }
+  }
+
+  function saveCadastros(arr) {
+    try { localStorage.setItem(CHAVE, JSON.stringify(arr)); } catch(e) {}
+  }
+
+  function renderTabela() {
+    const dados = getCadastros();
+    const tbody = document.getElementById('tbody');
+    const empty = document.getElementById('empty-state');
+    tbody.innerHTML = '';
+
+    // Stats
+    document.getElementById('stat-total').textContent = dados.length;
+
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    const hoje_count = dados.filter(d => d.data && d.data.startsWith(hoje)).length;
+    document.getElementById('stat-hoje').textContent = hoje_count;
+
+    const contagem = {};
+    dados.forEach(d => { if (d.animal && d.animal !== '—') contagem[d.animal] = (contagem[d.animal] || 0) + 1; });
+    const mais = Object.entries(contagem).sort((a,b) => b[1]-a[1])[0];
+    document.getElementById('stat-animal').textContent = mais ? mais[0] : '—';
+
+    if (!dados.length) {
+      empty.hidden = false;
+      return;
+    }
+    empty.hidden = true;
+
+    [...dados].reverse().forEach((c, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="color:var(--muted);font-size:.82rem">${dados.length - i}</td>
+        <td><strong>${esc(c.nome)}</strong></td>
+        <td style="color:var(--muted)">${esc(c.endereco)}</td>
+        <td><a href="https://wa.me/55${c.whatsapp.replace(/\D/g,'')}" target="_blank" style="color:var(--forest);text-decoration:none;font-weight:500">${esc(c.whatsapp)}</a></td>
+        <td><span class="badge-animal">${esc(c.animal)}</span></td>
+        <td style="color:var(--muted);font-size:.82rem;white-space:nowrap">${esc(c.data)}</td>
+        <td><button class="btn-del" onclick="deletar(${c.id})" title="Remover">✕</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function esc(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function deletar(id) {
+    if (!confirm('Remover este cadastro?')) return;
+    const arr = getCadastros().filter(c => c.id !== id);
+    saveCadastros(arr);
+    renderTabela();
+  }
+
+  function limparTudo() {
+    if (!confirm('Apagar TODOS os cadastros? Esta ação não pode ser desfeita.')) return;
+    saveCadastros([]);
+    renderTabela();
+  }
+
+  // Escuta novos cadastros em tempo real (quando vêm de outra aba)
+  let totalAnterior = getCadastros().length;
+  window.addEventListener('storage', function(e) {
+    if (e.key !== CHAVE) return;
+    const novos = getCadastros();
+    if (novos.length > totalAnterior) {
+      const diff = novos.length - totalAnterior;
+      mostrarToast(`🐾 ${diff} novo${diff > 1 ? 's' : ''} cadastro${diff > 1 ? 's' : ''} recebido${diff > 1 ? 's' : ''}!`);
+      renderTabela();
+    }
+    totalAnterior = novos.length;
+  });
+
+  let toastTimer;
+  function mostrarToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  function exportarCSV() {
+    const dados = getCadastros();
+    if (!dados.length) { alert('Nenhum cadastro para exportar.'); return; }
+    const linhas = [['#','Nome','Endereço','WhatsApp','Animal','Data/Hora']];
+    dados.forEach((c, i) => linhas.push([i+1, c.nome, c.endereco, c.whatsapp, c.animal, c.data]));
+    const csv = linhas.map(l => l.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cadastros_paraiso_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+</script>
+</body>
+</html>

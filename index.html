@@ -1,0 +1,1089 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paraíso dos Focinhos</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --forest: #1B4332;
+  --forest-mid: #2D6A4F;
+  --green-light: #52B788;
+  --leaf: #D8F3DC;
+  --amber: #F4A228;
+  --amber-dk: #D48810;
+  --coral: #E05C3A;
+  --coral-dk: #C44828;
+  --bg: #EFF5ED;
+  --surface: #FFFFFF;
+  --surface-alt: #F4F9F2;
+  --ink: #1C2822;
+  --muted: #5E7366;
+  --border: #CFE6D3;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --forest: #52B788; --forest-mid: #74C69D; --green-light: #95D5B2;
+    --leaf: #1B4332; --amber: #F4A228; --amber-dk: #FFBA3A;
+    --coral: #FF7355; --coral-dk: #E05C3A;
+    --bg: #0A1B10; --surface: #112218; --surface-alt: #162D1E;
+    --ink: #E0EDE4; --muted: #7EA88E; --border: #244030;
+  }
+}
+:root[data-theme="dark"] {
+  --forest: #52B788; --forest-mid: #74C69D; --green-light: #95D5B2;
+  --leaf: #1B4332; --amber: #F4A228; --amber-dk: #FFBA3A;
+  --coral: #FF7355; --coral-dk: #E05C3A;
+  --bg: #0A1B10; --surface: #112218; --surface-alt: #162D1E;
+  --ink: #E0EDE4; --muted: #7EA88E; --border: #244030;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* FLOATING PAWS */
+.paws-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+.fpaw {
+  position: absolute;
+  bottom: -80px;
+  opacity: 0;
+  animation: floatpaw var(--dur, 12s) var(--delay, 0s) infinite ease-in-out;
+}
+@keyframes floatpaw {
+  0%   { transform: translateY(0)    rotate(var(--rot, 0deg)) scale(1);    opacity: 0; }
+  8%   { opacity: var(--op, .18); }
+  88%  { opacity: var(--op, .18); }
+  100% { transform: translateY(-110vh) rotate(calc(var(--rot, 0deg) + 30deg)) scale(.7); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .fpaw { animation: none; display: none; } }
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+/* HEADER */
+.hdr {
+  background: var(--forest);
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 50;
+}
+.hdr-logo {
+  height: 80px;
+  width: auto;
+  mix-blend-mode: screen;
+}
+.logo-sub {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.55);
+  display: none;
+}
+@media (min-width: 500px) { .logo-sub { display: block; } }
+
+/* HERO */
+.hero {
+  background: var(--forest);
+  color: white;
+  text-align: center;
+  padding: 52px 20px 72px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 85%, rgba(82,183,136,.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%, rgba(244,162,40,.12) 0%, transparent 55%);
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 56px;
+  background: var(--bg);
+  clip-path: ellipse(58% 100% at 50% 100%);
+}
+.hero-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 14px;
+  position: relative;
+}
+.hero h1 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(2rem, 6vw, 3.6rem);
+  font-weight: 900;
+  line-height: 1.1;
+  text-wrap: balance;
+  margin: 0 0 16px;
+  letter-spacing: -.02em;
+  position: relative;
+}
+.hero h1 em { font-style: italic; color: var(--amber); }
+.hero-desc {
+  color: rgba(255,255,255,.72);
+  font-size: 1rem;
+  max-width: 440px;
+  margin: 0 auto;
+  line-height: 1.65;
+  position: relative;
+}
+
+/* BREEDS SECTION */
+.breeds {
+  padding: 48px 16px 40px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+.sec-eyebrow {
+  text-align: center;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--forest-mid);
+  margin-bottom: 10px;
+}
+.sec-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 700;
+  text-align: center;
+  text-wrap: balance;
+  margin: 0 0 36px;
+  color: var(--ink);
+  line-height: 1.25;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
+
+.card {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 18px 12px 16px;
+  text-align: center;
+  border: 1px solid var(--border);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.card { cursor: pointer; }
+.card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(0,0,0,.08); }
+.dog-img {
+  width: 100%;
+  max-width: 160px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0 auto 14px;
+  display: block;
+  background: var(--surface-alt);
+  border: 3px solid var(--border);
+  transition: transform .2s ease;
+}
+.card:hover .dog-img { transform: scale(1.05); }
+.breed-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--forest);
+  margin: 0 0 4px;
+}
+.breed-trait {
+  font-size: .76rem;
+  color: var(--muted);
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+.badge {
+  display: inline-block;
+  background: var(--leaf);
+  color: var(--forest);
+  font-size: .67rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* FILTER TABS */
+.filter-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+.ftab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface);
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .92rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 12px 28px;
+  border-radius: 60px;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.ftab:hover { border-color: var(--forest); color: var(--forest); }
+.ftab.active { background: var(--forest); color: white; border-color: var(--forest); }
+
+/* GATOS PLACEHOLDER */
+.gatos-placeholder {
+  text-align: center;
+  padding: 48px 24px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.gatos-placeholder h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+.gatos-placeholder p {
+  color: var(--muted);
+  font-size: .93rem;
+  line-height: 1.6;
+  margin: 0 0 20px;
+}
+
+/* VER OUTROS */
+.btn-outros {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  color: var(--forest);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .92rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 14px 36px;
+  border-radius: 60px;
+  border: 2px solid var(--forest);
+  cursor: pointer;
+  transition: background .15s, color .15s, transform .15s;
+}
+.btn-outros:hover {
+  background: var(--forest);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* CTA BAND */
+.cta-band {
+  background: var(--forest);
+  padding: 56px 20px;
+  text-align: center;
+}
+.cta-band h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 900;
+  color: white;
+  margin: 0 0 12px;
+  text-wrap: balance;
+  line-height: 1.2;
+}
+.cta-band p { color: rgba(255,255,255,.65); margin: 0 0 36px; max-width: 440px; margin-inline: auto; }
+.btn-cta {
+  display: inline-block;
+  background: var(--amber);
+  color: #1C2822;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(.85rem, 2.5vw, .95rem);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 18px 32px;
+  border-radius: 60px;
+  border: none;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  box-shadow: 0 6px 24px rgba(244,162,40,.4);
+  width: 100%;
+  max-width: 480px;
+  line-height: 1.4;
+}
+.btn-cta:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(244,162,40,.5); background: var(--amber-dk); }
+.btn-cta:active { transform: translateY(-1px); }
+.btn-cta:focus-visible { outline: 3px solid white; outline-offset: 4px; }
+@keyframes pulse-cta {
+  0%   { box-shadow: 0 6px 24px rgba(244,162,40,.4), 0 0 0 0 rgba(244,162,40,.5); }
+  60%  { box-shadow: 0 6px 24px rgba(244,162,40,.4), 0 0 0 18px rgba(244,162,40,0); }
+  100% { box-shadow: 0 6px 24px rgba(244,162,40,.4), 0 0 0 0 rgba(244,162,40,0); }
+}
+.btn-cta { animation: pulse-cta 2s ease-out infinite; }
+.btn-cta:hover { animation: none; }
+
+/* FOOTER */
+.footer {
+  background: var(--forest);
+  color: rgba(255,255,255,.45);
+  text-align: center;
+  padding: 20px 24px;
+  font-size: .8rem;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.footer strong { color: var(--amber); }
+
+/* FORM PAGE */
+.form-page {
+  min-height: 80vh;
+  padding: 36px 16px 48px;
+  background: var(--bg);
+}
+.form-wrap { max-width: 500px; margin: 0 auto; }
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--forest-mid);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 28px;
+  transition: color .1s;
+}
+.back-btn:hover { color: var(--forest); }
+.form-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  font-weight: 900;
+  color: var(--ink);
+  margin: 0 0 8px;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.form-hint { color: var(--muted); font-size: .92rem; margin: 0 0 28px; line-height: 1.5; }
+.form-card {
+  background: var(--surface);
+  border-radius: 22px;
+  padding: 24px 20px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 18px rgba(0,0,0,.04);
+}
+.field { margin-bottom: 18px; }
+.field label {
+  display: block;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+.field input {
+  width: 100%;
+  padding: 13px 15px;
+  background: var(--surface-alt);
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .98rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.field input:focus { border-color: var(--forest-mid); box-shadow: 0 0 0 3px rgba(45,106,79,.12); }
+.field input::placeholder { color: var(--muted); opacity: .55; }
+.btn-submit {
+  width: 100%;
+  background: var(--coral);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .95rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 17px;
+  border-radius: 11px;
+  border: none;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: background .15s ease, transform .15s ease;
+}
+.btn-submit:hover { background: var(--coral-dk); transform: translateY(-1px); }
+.btn-submit:focus-visible { outline: 3px solid var(--coral); outline-offset: 3px; }
+.field input.invalid { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(224,92,58,.12); }
+.field-error { font-size: .76rem; color: var(--coral); margin-top: 5px; display: none; }
+.field input.invalid + .field-error { display: block; }
+
+/* MODAL */
+.modal-bd {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 200;
+  animation: fdin .2s ease;
+}
+@keyframes fdin { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: var(--surface);
+  border-radius: 22px;
+  padding: 36px 28px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 28px 80px rgba(0,0,0,.22);
+  animation: sldin .22s ease;
+}
+@keyframes sldin { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+.modal-icon {
+  width: 60px; height: 60px;
+  background: #DCF6E9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+.modal h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+.modal p { color: var(--muted); font-size: .92rem; line-height: 1.6; margin: 0 0 24px; }
+.modal p strong { color: var(--forest); font-weight: 700; }
+.btn-wa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: #25D366;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .95rem;
+  font-weight: 700;
+  padding: 16px;
+  border-radius: 11px;
+  border: none;
+  cursor: pointer;
+  transition: background .15s ease, transform .15s ease;
+  margin-bottom: 10px;
+}
+.btn-wa:hover { background: #1BBE5A; transform: translateY(-1px); }
+.btn-wa:focus-visible { outline: 3px solid #25D366; outline-offset: 3px; }
+.btn-cancel {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem;
+  cursor: pointer;
+  padding: 8px;
+  width: 100%;
+  border-radius: 8px;
+  transition: color .1s, background .1s;
+}
+.btn-cancel:hover { color: var(--ink); background: var(--surface-alt); }
+
+/* HELP WIDGET */
+.help-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+.help-bubble {
+  background: var(--surface);
+  border-radius: 16px 16px 4px 16px;
+  padding: 14px 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+  max-width: 230px;
+  animation: sldin .3s cubic-bezier(.22,.68,0,1.15);
+  border: 1px solid var(--border);
+  position: relative;
+}
+.help-bubble p {
+  font-size: .88rem;
+  color: var(--ink);
+  margin: 0 0 10px;
+  line-height: 1.45;
+}
+.help-bubble p strong { color: var(--forest); }
+.help-bubble-close {
+  position: absolute;
+  top: 6px; right: 8px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  line-height: 1;
+}
+.help-bubble-close:hover { color: var(--ink); }
+.btn-help-wa {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: #25D366;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .82rem;
+  font-weight: 700;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-help-wa:hover { background: #1BBE5A; }
+.help-btn {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: #25D366;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(37,211,102,.45);
+  transition: transform .15s, box-shadow .15s;
+  animation: pulse-wa 2.5s ease-out infinite;
+  flex-shrink: 0;
+}
+.help-btn:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(37,211,102,.6); animation: none; }
+@keyframes pulse-wa {
+  0%   { box-shadow: 0 4px 18px rgba(37,211,102,.45), 0 0 0 0 rgba(37,211,102,.5); }
+  60%  { box-shadow: 0 4px 18px rgba(37,211,102,.45), 0 0 0 16px rgba(37,211,102,0); }
+  100% { box-shadow: 0 4px 18px rgba(37,211,102,.45), 0 0 0 0 rgba(37,211,102,0); }
+}
+
+/* MODAL — bottom sheet */
+.modal-bd {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 200;
+  animation: slideup .3s cubic-bezier(.22,.68,0,1.2);
+}
+@keyframes slideup { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  padding: 28px 24px 36px;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 -8px 40px rgba(0,0,0,.18);
+}
+.modal-drag {
+  width: 40px; height: 4px;
+  background: var(--border);
+  border-radius: 4px;
+  margin: 0 auto 20px;
+}
+.modal-icon {
+  width: 56px; height: 56px;
+  background: #DCF6E9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+}
+.modal h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 8px;
+  text-align: center;
+}
+.modal p { color: var(--muted); font-size: .92rem; line-height: 1.6; margin: 0 0 22px; text-align: center; }
+.modal p strong { color: var(--forest); font-weight: 700; }
+.btn-wa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: #25D366;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .95rem;
+  font-weight: 700;
+  padding: 16px;
+  border-radius: 11px;
+  border: none;
+  cursor: pointer;
+  transition: background .15s ease, transform .15s ease;
+  margin-bottom: 10px;
+}
+.btn-wa:hover { background: #1BBE5A; transform: translateY(-1px); }
+.btn-wa:focus-visible { outline: 3px solid #25D366; outline-offset: 3px; }
+</style>
+
+<!-- ===================== HOME ===================== -->
+<div id="pg-home">
+  <header class="hdr">
+    <img src="logo.png" alt="PARAISO DOS FOCINHOS" class="hdr-logo">
+  </header>
+
+  <section class="hero">
+    <p class="hero-eyebrow">Centro de Adoção de Cães</p>
+    <h1>Um amigo <em>pra vida toda</em><br>espera por você</h1>
+    <p class="hero-desc">Cada cãozinho tem uma história e muito amor para oferecer. Encontre seu companheiro ideal e transforme duas vidas.</p>
+  </section>
+
+  <section class="breeds">
+    <p class="sec-eyebrow">Animais disponíveis para adoção</p>
+    <h2 class="sec-title">Conheça alguns dos nossos filhotes</h2>
+
+    <!-- FILTRO -->
+    <div class="filter-tabs">
+      <button class="ftab active" id="tab-caes" onclick="switchTab('caes')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm15 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM7 7a1.5 1.5 0 100-3A1.5 1.5 0 007 7zm10 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM12 22c-4 0-8-2.5-8-7 0-1.5.5-3 1.5-4.2C6.5 9.5 8 9 9 9h6c1 0 2.5.5 3.5 1.8C19.5 12 20 13.5 20 15c0 4.5-4 7-8 7z"/></svg>
+        Cães
+      </button>
+      <button class="ftab" id="tab-gatos" onclick="switchTab('gatos')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8l5 4-3 4zm4-6l-2-1.5V7h2v3z"/></svg>
+        Gatos
+      </button>
+    </div>
+
+    <!-- CÃES -->
+    <div id="panel-caes">
+    <div class="grid">
+
+      <!-- CHIHUAHUA -->
+      <div class="card" onclick="selectAnimal('Chihuahua')">
+        <img class="dog-img" id="dog-chihuahua" alt="Chihuahua">
+        <p class="breed-name">Chihuahua</p>
+        <p class="breed-trait">Pequenino, corajoso e cheio de personalidade</p>
+        <span class="badge">Disponível</span>
+      </div>
+
+      <!-- POODLE -->
+      <div class="card" onclick="selectAnimal('Poodle')">
+        <img class="dog-img" id="dog-poodle" alt="Poodle">
+        <p class="breed-name">Poodle</p>
+        <p class="breed-trait">Inteligente, elegante e muito carinhoso</p>
+        <span class="badge">Disponível</span>
+      </div>
+
+      <!-- SHIH TZU -->
+      <div class="card" onclick="selectAnimal('Shih Tzu')">
+        <img class="dog-img" id="dog-shihtzu" alt="Shih Tzu">
+        <p class="breed-name">Shih Tzu</p>
+        <p class="breed-trait">Dócil, afetivo e perfeito para apartamentos</p>
+        <span class="badge">Disponível</span>
+      </div>
+
+      <!-- BULLDOG -->
+      <div class="card" onclick="selectAnimal('Bulldog')">
+        <img class="dog-img" id="dog-bulldog" alt="Bulldog">
+        <p class="breed-name">Bulldog</p>
+        <p class="breed-trait">Calmo, leal e repleto de charme</p>
+        <span class="badge">Disponível</span>
+      </div>
+      <!-- SPITZ ALEMÃO -->
+      <div class="card" onclick="selectAnimal('Spitz Alemão')">
+        <img class="dog-img" id="dog-spitz" alt="Spitz Alemão">
+        <p class="breed-name">Spitz Alemão</p>
+        <p class="breed-trait">Fofo, animado e muito expressivo</p>
+        <span class="badge">Disponível</span>
+      </div>
+
+      <!-- PEQUINÊS -->
+      <div class="card" onclick="selectAnimal('Pequinês')">
+        <img class="dog-img" id="dog-pekinese" alt="Pequinês">
+        <p class="breed-name">Pequinês</p>
+        <p class="breed-trait">Independente, nobre e cheio de charme</p>
+        <span class="badge">Disponível</span>
+      </div>
+
+      <!-- PAPILLON -->
+      <div class="card" onclick="selectAnimal('Papillon')">
+        <img class="dog-img" id="dog-papillon" alt="Papillon">
+        <p class="breed-name">Papillon</p>
+        <p class="breed-trait">Ágil, inteligente e muito brincalhão</p>
+        <span class="badge">Disponível</span>
+      </div>
+
+      <!-- MALTÊS -->
+      <div class="card" onclick="selectAnimal('Maltês')">
+        <img class="dog-img" id="dog-maltese" alt="Maltês">
+        <p class="breed-name">Maltês</p>
+        <p class="breed-trait">Doce, gentil e companheiro fiel</p>
+        <span class="badge">Disponível</span>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:32px;">
+      <button class="btn-outros" onclick="window.open('https://wa.me/5521984207429','_blank')">
+        Ver Outros Animais
+      </button>
+    </div>
+    </div><!-- /panel-caes -->
+
+    <!-- GATOS -->
+    <div id="panel-gatos" hidden>
+      <div class="grid">
+
+        <div class="card" onclick="selectAnimal('British Shorthair')">
+          <img class="dog-img" id="cat-british" alt="British Shorthair">
+          <p class="breed-name">British Shorthair</p>
+          <p class="breed-trait">Tranquilo, robusto e muito carinhoso</p>
+          <span class="badge">Disponível</span>
+        </div>
+
+        <div class="card" onclick="selectAnimal('Bengal')">
+          <img class="dog-img" id="cat-bengal" alt="Bengal">
+          <p class="breed-name">Bengal</p>
+          <p class="breed-trait">Ativo, selvagem no visual e super brincalhão</p>
+          <span class="badge">Disponível</span>
+        </div>
+
+        <div class="card" onclick="selectAnimal('Maine Coon')">
+          <img class="dog-img" id="cat-mainecoon" alt="Maine Coon">
+          <p class="breed-name">Maine Coon</p>
+          <p class="breed-trait">Gigante, gentil e companheiro fiel</p>
+          <span class="badge">Disponível</span>
+        </div>
+
+        <div class="card" onclick="selectAnimal('Siamês')">
+          <img class="dog-img" id="cat-siames" alt="Siamês">
+          <p class="breed-name">Siamês</p>
+          <p class="breed-trait">Comunicativo, elegante e muito fiel</p>
+          <span class="badge">Disponível</span>
+        </div>
+
+      </div>
+
+      <div style="text-align:center;margin-top:32px;">
+        <button class="btn-outros" onclick="window.open('https://wa.me/5521984207429','_blank')">
+          Ver Outros Gatos
+        </button>
+      </div>
+    </div><!-- /panel-gatos -->
+
+  </section>
+
+  <section class="cta-band">
+    <h2>Pronto para dar um lar a um cãozinho?</h2>
+    <p>Preencha o cadastro e nossa equipe entrará em contato para os próximos passos da adoção.</p>
+    <button class="btn-cta" onclick="showForm()">
+      Faça seu Cadastro e Adote um Amigo
+    </button>
+  </section>
+
+  <footer class="footer">
+    <strong>PARAISO DOS FOCINHOS</strong> — ONG de Adoção de Cães &nbsp;·&nbsp; Todos os animais merecem amor<br>
+    CNPJ: 19.614.984/0001-29
+    <br><a href="admin.html" style="color:var(--muted);font-size:.75rem;opacity:.5;text-decoration:none;" title="Painel administrativo">&#9679; admin</a>
+  </footer>
+</div>
+
+<!-- ===================== FORM ===================== -->
+<div id="pg-form" hidden>
+  <header class="hdr">
+    <img src="logo.png" alt="PARAISO" class="hdr-logo">
+  </header>
+
+  <div class="form-page">
+    <div class="form-wrap">
+      <button class="back-btn" onclick="showHome()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M10 12 L6 8 L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Voltar ao início
+      </button>
+
+      <h2 class="form-title">Quero adotar um amigo</h2>
+      <div id="animal-selecionado" hidden style="display:flex;align-items:center;gap:10px;background:var(--leaf);border:1.5px solid var(--border);border-radius:12px;padding:10px 16px;margin-bottom:12px;font-size:.92rem;color:var(--forest);font-weight:600;">
+        <span style="font-size:1.3rem;">🐾</span>
+        <span>Animal de interesse: <strong id="animal-nome"></strong></span>
+      </div>
+      <p class="form-hint">Preencha seus dados abaixo. Um de nossos atendentes do <strong>PARAISO</strong> entrará em contato via WhatsApp para dar continuidade ao processo.</p>
+
+      <div class="form-card">
+        <form id="adopt-form" onsubmit="handleSubmit(event)" novalidate>
+          <div class="field">
+            <label for="f-name">Nome completo</label>
+            <input type="text" id="f-name" placeholder="Seu nome completo" autocomplete="name">
+            <span class="field-error">Informe seu nome completo</span>
+          </div>
+          <div class="field">
+            <label for="f-addr">Endereço</label>
+            <input type="text" id="f-addr" placeholder="Rua, número, bairro e cidade" autocomplete="street-address">
+            <span class="field-error">Informe seu endereço</span>
+          </div>
+          <div class="field">
+            <label for="f-wa">WhatsApp</label>
+            <input type="tel" id="f-wa" placeholder="(00) 00000-0000" autocomplete="tel" inputmode="numeric">
+            <span class="field-error">Informe seu WhatsApp</span>
+          </div>
+          <button type="submit" class="btn-submit">Enviar Cadastro</button>
+        </form>
+
+        <!-- Sucesso -->
+        <div id="form-sucesso" hidden style="text-align:center;padding:32px 16px;">
+          <div style="width:64px;height:64px;background:var(--leaf);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path d="M7 16l7 7 11-12" stroke="#1B4332" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 style="font-family:'Fraunces',Georgia,serif;color:var(--forest);font-size:1.3rem;margin-bottom:8px;">Cadastro recebido!</h3>
+          <p style="color:var(--muted);font-size:.92rem;line-height:1.5;margin-bottom:24px;">Seus dados foram salvos com sucesso. Você será direcionado(a) ao WhatsApp da ONG para dar continuidade ao processo de adoção.</p>
+          <button class="btn-submit" style="background:var(--forest);" onclick="showHome()">Voltar ao início</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- HELP WIDGET -->
+<div class="help-widget" id="help-widget">
+  <div class="help-bubble" id="help-bubble">
+    <button class="help-bubble-close" id="help-bubble-close" aria-label="Fechar">&#x2715;</button>
+    <p>Olá! Precisa de <strong>ajuda</strong>? Fale com nossa equipe agora mesmo!</p>
+    <button class="btn-help-wa" id="btn-help-wa">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+      </svg>
+      Falar no WhatsApp
+    </button>
+  </div>
+  <button class="help-btn" id="help-toggle" aria-label="Ajuda">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+  const WA = '5521984207429';
+
+  // Tab switch
+  function switchTab(tab) {
+    document.getElementById('panel-caes').hidden  = tab !== 'caes';
+    document.getElementById('panel-gatos').hidden = tab !== 'gatos';
+    document.getElementById('tab-caes').classList.toggle('active',  tab === 'caes');
+    document.getElementById('tab-gatos').classList.toggle('active', tab === 'gatos');
+  }
+
+  // Help widget
+  const helpBubble = document.getElementById('help-bubble');
+  document.getElementById('help-toggle').addEventListener('click', function() {
+    helpBubble.hidden = !helpBubble.hidden;
+  });
+  document.getElementById('help-bubble-close').addEventListener('click', function() {
+    helpBubble.hidden = true;
+  });
+  document.getElementById('btn-help-wa').addEventListener('click', function() {
+    window.open(`https://wa.me/${WA}`, '_blank');
+  });
+  // Mostra a bolha após 2s ao carregar
+  helpBubble.hidden = true;
+  setTimeout(function() { helpBubble.hidden = false; }, 2000);
+
+  // Floating paws
+  const pawSVG = `<svg viewBox="0 0 64 64" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="32" cy="42" rx="16" ry="14"/>
+    <ellipse cx="14" cy="28" rx="7" ry="9"/>
+    <ellipse cx="50" cy="28" rx="7" ry="9"/>
+    <ellipse cx="22" cy="18" rx="6" ry="8"/>
+    <ellipse cx="42" cy="18" rx="6" ry="8"/>
+  </svg>`;
+  const layer = document.createElement('div');
+  layer.className = 'paws-layer';
+  document.body.appendChild(layer);
+  const colors = ['#F4A228','#52B788','#ffffff','#E05C3A'];
+  for (let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    el.className = 'fpaw';
+    const size = 24 + Math.random() * 36;
+    const left = Math.random() * 96;
+    const dur  = 10 + Math.random() * 14;
+    const delay = -(Math.random() * dur);
+    const rot  = -40 + Math.random() * 80;
+    const op   = 0.10 + Math.random() * 0.18;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    el.style.cssText = `width:${size}px;height:${size}px;left:${left}%;color:${color};--dur:${dur.toFixed(1)}s;--delay:${delay.toFixed(1)}s;--rot:${rot.toFixed(0)}deg;--op:${op.toFixed(2)};`;
+    el.innerHTML = pawSVG;
+    layer.appendChild(el);
+  }
+
+  const dogBreeds = [
+    { id: 'dog-chihuahua', url: null, src: 'chihuahua.png' },
+    { id: 'dog-poodle',    url: null, src: 'poodle.webp' },
+    { id: 'dog-shihtzu',   url: null, src: 'shihtzu.jpg' },
+    { id: 'dog-bulldog',   url: null, src: 'bulldog.avif' },
+    { id: 'dog-spitz',    url: null, src: 'spitz.jpg' },
+    { id: 'dog-pekinese', url: null, src: 'pekinese.jpg' },
+    { id: 'dog-papillon', url: null, src: 'papillon.jpg' },
+    { id: 'dog-maltese',  url: null, src: 'maltese.webp' },
+  ];
+  dogBreeds.forEach(({ id, url, src }) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (src) { el.src = src; return; }
+    fetch(url)
+      .then(r => r.json())
+      .then(data => { if (data.message) el.src = data.message; })
+      .catch(() => {});
+  });
+
+  const catBreeds = [
+    { id: 'cat-british',   breedId: null, src: 'british.jpg' },
+    { id: 'cat-bengal',    breedId: null, src: 'bengal.jpg' },
+    { id: 'cat-mainecoon', breedId: null, src: 'mainecoon.avif' },
+    { id: 'cat-siames',    breedId: null, src: 'siames.jpg' },
+  ];
+  catBreeds.forEach(({ id, breedId, src }) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (src) { el.src = src; return; }
+    fetch(`https://api.thecatapi.com/v1/images/search?breed_ids=${breedId}&limit=1`)
+      .then(r => r.json())
+      .then(data => { if (data[0]?.url) el.src = data[0].url; })
+      .catch(() => {});
+  });
+
+  let animalEscolhido = '';
+
+  function selectAnimal(nome) {
+    animalEscolhido = nome;
+    document.getElementById('animal-nome').textContent = nome;
+    document.getElementById('animal-selecionado').hidden = false;
+    showForm();
+  }
+
+  function showForm() {
+    document.getElementById('pg-home').hidden = true;
+    document.getElementById('pg-form').hidden = false;
+    window.scrollTo({ top: 0 });
+  }
+
+  function showHome() {
+    document.getElementById('pg-home').hidden = false;
+    document.getElementById('pg-form').hidden = true;
+    // Reseta formulário para próximo uso
+    document.getElementById('adopt-form').reset();
+    document.getElementById('adopt-form').hidden = false;
+    document.getElementById('form-sucesso').hidden = true;
+    document.getElementById('animal-selecionado').hidden = true;
+    animalEscolhido = '';
+    ['f-name','f-addr','f-wa'].forEach(id => document.getElementById(id).classList.remove('invalid'));
+    window.scrollTo({ top: 0 });
+  }
+
+  function closeModal() {
+    document.getElementById('modal').hidden = true;
+  }
+  document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  document.getElementById('f-wa').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length > 7) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+    else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+    else if (v.length) v = `(${v}`;
+    this.value = v;
+  });
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const nameEl = document.getElementById('f-name');
+    const addrEl = document.getElementById('f-addr');
+    const waEl   = document.getElementById('f-wa');
+
+    const name = nameEl.value.trim();
+    const addr = addrEl.value.trim();
+    const wa   = waEl.value.trim();
+
+    let valid = true;
+    [{ el: nameEl, val: name }, { el: addrEl, val: addr }, { el: waEl, val: wa }].forEach(({ el, val }) => {
+      if (!val) {
+        el.classList.add('invalid');
+        valid = false;
+      } else {
+        el.classList.remove('invalid');
+      }
+    });
+
+    if (!valid) {
+      document.querySelector('.field input.invalid').focus();
+      return;
+    }
+
+    try {
+      const cadastros = JSON.parse(localStorage.getItem('pf_cadastros') || '[]');
+      cadastros.push({
+        id: Date.now(),
+        nome: name,
+        endereco: addr,
+        whatsapp: wa,
+        animal: animalEscolhido || '—',
+        data: new Date().toLocaleString('pt-BR')
+      });
+      localStorage.setItem('pf_cadastros', JSON.stringify(cadastros));
+    } catch(e) {}
+
+    // Mostra tela de sucesso e abre WhatsApp simultaneamente
+    document.getElementById('adopt-form').hidden = true;
+    document.getElementById('form-sucesso').hidden = false;
+    document.getElementById('animal-selecionado').hidden = true;
+    window.open(`https://wa.me/${WA}`, '_blank');
+  }
+
+  ['f-name','f-addr','f-wa'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function() {
+      if (this.value.trim()) this.classList.remove('invalid');
+    });
+  });
+</script>
