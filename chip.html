@@ -236,7 +236,17 @@ body {
 .field-hint { font-size: .76rem; color: var(--muted); margin-top: 2px; }
 
 /* RADIO GROUP — Local Adequado */
-.radio-group { display: flex; flex-direction: column; gap: 10px; }
+.radio-group { display: flex; flex-direction: column; gap: 8px; max-width: 400px; }
+.radio-group-hint {
+  font-size: .8rem;
+  color: var(--muted);
+  background: var(--surface-alt);
+  border-left: 3px solid var(--green-light);
+  padding: 7px 10px;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 4px;
+  line-height: 1.45;
+}
 .radio-opt {
   display: flex;
   align-items: center;
@@ -455,6 +465,7 @@ body {
       <div class="field">
         <label>A residência tem local adequado para o animal? <span>*</span></label>
         <div class="radio-group" id="rg-local">
+          <p class="radio-group-hint"><strong>Sim — tenho espaço amplo</strong><br>Quintal, varanda grande ou área exclusiva para o animal.</p>
           <label class="radio-opt" onclick="marcarOpcao(this)">
             <input type="radio" name="local" value="sim_espaco">
             <div>
