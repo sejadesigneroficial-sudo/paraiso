@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <style>
     :root {
       --forest: #1B4332;
@@ -362,7 +363,12 @@
 
 <script>
   const SENHA = 'paraiso2024';
-  const CHAVE = 'pf_cadastros';
+  const SUPABASE_URL = 'https://fuvsfrujnfgkpvvpimbx.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_reR5oymvps_Z5v3PkuppPA_Ar-eG5m0';
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let dadosCache = [];
 
   document.getElementById('inp-senha').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') tentarLogin();
@@ -373,7 +379,8 @@
     if (v === SENHA) {
       document.getElementById('pg-login').style.display = 'none';
       document.getElementById('pg-admin').style.display = 'block';
-      renderTabela();
+      carregarTabela();
+      iniciarTempoReal();
     } else {
       document.getElementById('inp-senha').classList.add('invalid');
       document.getElementById('login-erro').hidden = false;
@@ -388,24 +395,25 @@
     document.getElementById('login-erro').hidden = true;
   }
 
-  function getCadastros() {
-    try { return JSON.parse(localStorage.getItem(CHAVE) || '[]'); } catch(e) { return []; }
+  async function carregarTabela() {
+    document.getElementById('stat-total').textContent = '…';
+    const { data, error } = await db
+      .from('cadastros')
+      .select('*')
+      .order('id', { ascending: false });
+    if (error) { console.error(error); return; }
+    dadosCache = data || [];
+    renderTabela(dadosCache);
   }
 
-  function saveCadastros(arr) {
-    try { localStorage.setItem(CHAVE, JSON.stringify(arr)); } catch(e) {}
-  }
-
-  function renderTabela() {
-    const dados = getCadastros();
+  function renderTabela(dados) {
     const tbody = document.getElementById('tbody');
     const empty = document.getElementById('empty-state');
     tbody.innerHTML = '';
 
-    // Stats
     document.getElementById('stat-total').textContent = dados.length;
 
-    const hoje = new Date().toLocaleDateString('pt-BR');
+    const hoje = new Date().toISOString().slice(0, 10);
     const hoje_count = dados.filter(d => d.data && d.data.startsWith(hoje)).length;
     document.getElementById('stat-hoje').textContent = hoje_count;
 
@@ -414,71 +422,55 @@
     const mais = Object.entries(contagem).sort((a,b) => b[1]-a[1])[0];
     document.getElementById('stat-animal').textContent = mais ? mais[0] : '—';
 
-    if (!dados.length) {
-      empty.hidden = false;
-      return;
-    }
+    if (!dados.length) { empty.hidden = false; return; }
     empty.hidden = true;
 
-    [...dados].reverse().forEach((c, i) => {
+    dados.forEach((c, i) => {
+      const dataFmt = c.data ? new Date(c.data).toLocaleString('pt-BR') : '—';
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="color:var(--muted);font-size:.82rem">${dados.length - i}</td>
         <td><strong>${esc(c.nome)}</strong></td>
         <td style="color:var(--muted)">${esc(c.endereco)}</td>
-        <td><a href="https://wa.me/55${c.whatsapp.replace(/\D/g,'')}" target="_blank" style="color:var(--forest);text-decoration:none;font-weight:500">${esc(c.whatsapp)}</a></td>
+        <td><a href="https://wa.me/55${String(c.whatsapp).replace(/\D/g,'')}" target="_blank" style="color:var(--forest);text-decoration:none;font-weight:500">${esc(c.whatsapp)}</a></td>
         <td><span class="badge-animal">${esc(c.animal)}</span></td>
-        <td style="color:var(--muted);font-size:.82rem;white-space:nowrap">${esc(c.data)}</td>
+        <td style="color:var(--muted);font-size:.82rem;white-space:nowrap">${esc(dataFmt)}</td>
         <td><button class="btn-del" onclick="deletar(${c.id})" title="Remover">✕</button></td>
       `;
       tbody.appendChild(tr);
     });
   }
 
+  function iniciarTempoReal() {
+    db.channel('cadastros-live')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'cadastros' }, () => {
+        mostrarToast('🐾 Novo cadastro recebido!');
+        carregarTabela();
+      })
+      .subscribe();
+  }
+
   function esc(str) {
     return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  function deletar(id) {
+  async function deletar(id) {
     if (!confirm('Remover este cadastro?')) return;
-    const arr = getCadastros().filter(c => c.id !== id);
-    saveCadastros(arr);
-    renderTabela();
+    await db.from('cadastros').delete().eq('id', id);
+    carregarTabela();
   }
 
-  function limparTudo() {
+  async function limparTudo() {
     if (!confirm('Apagar TODOS os cadastros? Esta ação não pode ser desfeita.')) return;
-    saveCadastros([]);
-    renderTabela();
+    await db.from('cadastros').delete().gte('id', 0);
+    carregarTabela();
   }
 
-  // Escuta novos cadastros em tempo real (quando vêm de outra aba)
-  let totalAnterior = getCadastros().length;
-  window.addEventListener('storage', function(e) {
-    if (e.key !== CHAVE) return;
-    const novos = getCadastros();
-    if (novos.length > totalAnterior) {
-      const diff = novos.length - totalAnterior;
-      mostrarToast(`🐾 ${diff} novo${diff > 1 ? 's' : ''} cadastro${diff > 1 ? 's' : ''} recebido${diff > 1 ? 's' : ''}!`);
-      renderTabela();
-    }
-    totalAnterior = novos.length;
-  });
-
-  let toastTimer;
-  function mostrarToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
-  }
-
-  function exportarCSV() {
-    const dados = getCadastros();
-    if (!dados.length) { alert('Nenhum cadastro para exportar.'); return; }
+  async function exportarCSV() {
+    const { data } = await db.from('cadastros').select('*').order('id');
+    if (!data || !data.length) { alert('Nenhum cadastro para exportar.'); return; }
     const linhas = [['#','Nome','Endereço','WhatsApp','Animal','Data/Hora']];
-    dados.forEach((c, i) => linhas.push([i+1, c.nome, c.endereco, c.whatsapp, c.animal, c.data]));
+    data.forEach((c, i) => linhas.push([i+1, c.nome, c.endereco, c.whatsapp, c.animal, new Date(c.data).toLocaleString('pt-BR')]));
     const csv = linhas.map(l => l.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -487,6 +479,15 @@
     a.download = `cadastros_paraiso_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  let toastTimer;
+  function mostrarToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
   }
 </script>
 </body>

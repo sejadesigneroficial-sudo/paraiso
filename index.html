@@ -5,6 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
 <style>
 :root {
@@ -905,6 +906,12 @@ body {
 <script>
   const WA = '5521984207429';
 
+  // Supabase
+  const SUPABASE_URL = 'https://fuvsfrujnfgkpvvpimbx.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_reR5oymvps_Z5v3PkuppPA_Ar-eG5m0';
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
   // Tab switch
   function switchTab(tab) {
     document.getElementById('panel-caes').hidden  = tab !== 'caes';
@@ -1061,18 +1068,15 @@ body {
       return;
     }
 
-    try {
-      const cadastros = JSON.parse(localStorage.getItem('pf_cadastros') || '[]');
-      cadastros.push({
-        id: Date.now(),
-        nome: name,
-        endereco: addr,
-        whatsapp: wa,
-        animal: animalEscolhido || '—',
-        data: new Date().toLocaleString('pt-BR')
-      });
-      localStorage.setItem('pf_cadastros', JSON.stringify(cadastros));
-    } catch(e) {}
+    // Salva no Supabase
+    db.from('cadastros').insert({
+      nome: name,
+      endereco: addr,
+      whatsapp: wa,
+      animal: animalEscolhido || '—'
+    }).then(({ error }) => {
+      if (error) console.error('Erro Supabase:', error.message);
+    });
 
     // Mostra tela de sucesso e abre WhatsApp simultaneamente
     document.getElementById('adopt-form').hidden = true;
