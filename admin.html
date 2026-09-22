@@ -133,6 +133,10 @@
     .btn-save-obs:hover { background: var(--forest-mid); }
     .btn-cancel-obs { padding: 10px 16px; background: transparent; border: 1.5px solid var(--border); border-radius: 9px; font-size: .9rem; cursor: pointer; color: var(--muted); }
 
+    /* ── NOVO badge ── */
+    .badge-novo { display: inline-block; background: var(--coral); color: white; border-radius: 20px; padding: 2px 8px; font-size: .64rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-left: 6px; animation: pulse-novo 2s ease-in-out infinite; }
+    @keyframes pulse-novo { 0%,100% { opacity:1; } 50% { opacity:.55; } }
+
     /* ── ONLINE ── */
     @keyframes pulsar { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(1.3); } }
     .dot-online { background: #22c55e !important; animation: pulsar 1.5s ease-in-out infinite; }
@@ -222,6 +226,12 @@
         </optgroup>
         <option value="Outro">Outro</option>
       </select>
+      <select class="sel-filtro" id="fil-periodo" onchange="aplicarFiltros()">
+        <option value="">Todo o período</option>
+        <option value="hoje">Hoje</option>
+        <option value="semana">Esta semana</option>
+        <option value="mes">Este mês</option>
+      </select>
       <button class="btn-icon" onclick="carregarTabela()">↻ Atualizar</button>
       <button class="btn-icon" onclick="exportarCSV()">⬇ CSV</button>
       <button class="btn-icon btn-danger" onclick="limparTudo()">Limpar tudo</button>
@@ -285,6 +295,7 @@
   let obsIdAtual = null;
   let chartDias = null;
   let chartAnimais = null;
+  let ultimaVisitaAdmin = '2000-01-01T00:00:00Z';
 
   // ── LOGIN ──
   document.getElementById('inp-senha').addEventListener('keydown', e => { if (e.key === 'Enter') tentarLogin(); });
@@ -298,6 +309,10 @@
     const v = document.getElementById('inp-senha').value;
     const h = await hashStr(v);
     if (h === SENHA_HASH) {
+      try {
+        ultimaVisitaAdmin = localStorage.getItem('pf_adm_last_visit') || '2000-01-01T00:00:00Z';
+        localStorage.setItem('pf_adm_last_visit', new Date().toISOString());
+      } catch(e) {}
       document.getElementById('pg-login').style.display = 'none';
       document.getElementById('pg-admin').style.display = 'block';
       carregarTabela();
@@ -341,12 +356,23 @@
     const busca   = document.getElementById('inp-busca').value.toLowerCase();
     const status  = document.getElementById('fil-status').value;
     const animal  = document.getElementById('fil-animal').value;
+    const periodo = document.getElementById('fil-periodo').value;
+    const agora   = new Date();
 
     dadosFiltrados = dadosTodos.filter(c => {
       const okBusca  = !busca  || c.nome?.toLowerCase().includes(busca) || c.whatsapp?.includes(busca);
       const okStatus = !status || c.status === status;
       const okAnimal = !animal || c.animal === animal;
-      return okBusca && okStatus && okAnimal;
+      let okPeriodo  = true;
+      if (periodo && c.data) {
+        const d = new Date(c.data);
+        if (periodo === 'hoje') okPeriodo = d.toISOString().slice(0,10) === agora.toISOString().slice(0,10);
+        else if (periodo === 'semana') {
+          const s = new Date(agora); s.setDate(agora.getDate() - agora.getDay()); s.setHours(0,0,0,0);
+          okPeriodo = d >= s;
+        } else if (periodo === 'mes') okPeriodo = d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+      }
+      return okBusca && okStatus && okAnimal && okPeriodo;
     });
 
     ordenarDados();
@@ -398,11 +424,12 @@
       const tel = String(c.whatsapp || '').replace(/\D/g,'');
       const msg = encodeURIComponent(`Olá ${c.nome}! 🐾 Somos do PARAISO DOS FOCINHOS. Recebemos seu interesse em adotar um(a) ${c.animal || 'animal'} e gostaríamos de dar continuidade ao seu cadastro. Podemos conversar?`);
       const statusClass = { 'Aguardando':'s-aguardando','Em contato':'s-contato','Aprovado':'s-aprovado','Recusado':'s-recusado' }[c.status] || 's-aguardando';
+      const isNovo = c.data && c.data > ultimaVisitaAdmin;
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="color:var(--muted);font-size:.8rem;font-variant-numeric:tabular-nums">${num}</td>
         <td>
-          <strong>${esc(c.nome)}</strong>
+          <strong>${esc(c.nome)}</strong>${isNovo ? '<span class="badge-novo">Novo</span>' : ''}
           ${c.observacoes ? `<br><span style="font-size:.76rem;color:var(--muted);font-style:italic">${esc(c.observacoes.slice(0,50))}${c.observacoes.length>50?'…':''}</span>` : ''}
         </td>
         <td style="color:var(--muted);font-size:.82rem;max-width:180px">${esc(c.endereco)}</td>
@@ -422,6 +449,7 @@
         <td style="white-space:nowrap;display:flex;gap:6px;align-items:center">
           <a href="https://wa.me/55${tel}?text=${msg}" target="_blank" class="btn-wa" title="Abrir WhatsApp">💬</a>
           <button class="btn-icon" style="padding:5px 8px;font-size:.8rem" onclick="abrirModalObs(${c.id},'${esc(c.observacoes||'')}')" title="Observações">📝</button>
+          <button class="btn-icon" style="padding:5px 8px;font-size:.8rem" onclick="imprimirCadastro(${c.id})" title="Imprimir ficha">🖨️</button>
           <button class="btn-del" onclick="deletar(${c.id})" title="Remover">✕</button>
         </td>
       `;
@@ -569,10 +597,21 @@
 
   // ── TEMPO REAL ──
   function iniciarTempoReal() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
     db.channel('cadastros-live')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'cadastros' }, () => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'cadastros' }, payload => {
         carregarTabela();
         mostrarToast('🐾 Novo cadastro recebido!');
+        try {
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('🐾 Paraíso dos Focinhos', {
+              body: `${payload.new?.nome || 'Novo cliente'} quer adotar ${payload.new?.animal || 'um animal'}`,
+              icon: '/logo.png'
+            });
+          }
+        } catch(e) {}
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'visitas' }, payload => {
         visitasTodos.unshift(payload.new);
@@ -623,6 +662,37 @@
       mostrarToast('✓ Este dispositivo não contará mais como visita.');
     }
     atualizarBotaoDispositivo();
+  }
+
+  // ── IMPRIMIR ──
+  function imprimirCadastro(id) {
+    const c = dadosTodos.find(x => x.id === id);
+    if (!c) return;
+    const dataFmt = c.data ? new Date(c.data).toLocaleString('pt-BR') : '—';
+    const w = window.open('', '_blank', 'width=640,height=760');
+    w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Cadastro — ${esc(c.nome)}</title><style>
+      body{font-family:Arial,Helvetica,sans-serif;padding:40px;color:#1C2822;max-width:480px;margin:0 auto;}
+      h1{color:#1B4332;font-size:1.1rem;margin:0 0 4px;letter-spacing:.01em;}
+      .sub{color:#5E7366;font-size:.82rem;margin:0 0 24px;}
+      hr{border:none;border-top:1px solid #CFE6D3;margin:0 0 22px;}
+      .row{margin-bottom:16px;}
+      .lbl{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5E7366;margin-bottom:3px;}
+      .val{font-size:.96rem;color:#1C2822;}
+      .status{display:inline-block;background:#D8F3DC;color:#1B4332;padding:3px 10px;border-radius:20px;font-size:.8rem;font-weight:700;}
+      @media print{body{padding:20px;}}
+    </style></head><body>
+      <h1>PARAÍSO DOS FOCINHOS — Ficha de Cadastro</h1>
+      <p class="sub">#${c.id} &nbsp;·&nbsp; ${dataFmt}</p>
+      <hr>
+      <div class="row"><div class="lbl">Nome completo</div><div class="val">${esc(c.nome)}</div></div>
+      <div class="row"><div class="lbl">Endereço</div><div class="val">${esc(c.endereco)}</div></div>
+      <div class="row"><div class="lbl">WhatsApp</div><div class="val">${esc(c.whatsapp)}</div></div>
+      <div class="row"><div class="lbl">Animal de interesse</div><div class="val">${esc(c.animal||'—')}</div></div>
+      <div class="row"><div class="lbl">Status</div><div class="val"><span class="status">${esc(c.status||'Aguardando')}</span></div></div>
+      ${c.observacoes ? `<div class="row"><div class="lbl">Observações</div><div class="val">${esc(c.observacoes)}</div></div>` : ''}
+      <script>window.onload=function(){window.print();}<\/script>
+    </body></html>`);
+    w.document.close();
   }
 
   // ── UTILS ──

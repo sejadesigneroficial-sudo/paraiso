@@ -1,6 +1,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paraíso dos Focinhos</title>
+<title>Paraíso dos Focinhos — Adoção de Cães e Gatos</title>
+<meta name="description" content="Adote um amigo para a vida toda. PARAISO DOS FOCINHOS é uma ONG de adoção de cães e gatos. Chihuahua, Poodle, Shih Tzu, Bengal, Maine Coon e muito mais. Faça seu cadastro!">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://paraisodosfocinhos.online/">
+<meta property="og:title" content="Paraíso dos Focinhos — Adoção de Cães e Gatos">
+<meta property="og:description" content="Um amigo para a vida toda espera por você. Cães e gatos disponíveis para adoção. Transforme duas vidas hoje!">
+<meta property="og:image" content="https://paraisodosfocinhos.online/chihuahua.png">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Paraíso dos Focinhos">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Paraíso dos Focinhos — Adoção de Cães e Gatos">
+<meta name="twitter:description" content="Um amigo para a vida toda espera por você. Cães e gatos disponíveis para adoção.">
+<meta name="twitter:image" content="https://paraisodosfocinhos.online/chihuahua.png">
+<link rel="canonical" href="https://paraisodosfocinhos.online/">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -540,6 +553,43 @@ body {
 }
 .btn-cancel:hover { color: var(--ink); background: var(--surface-alt); }
 
+/* ANIMAL PREVIEW NO FORMULÁRIO */
+.form-animal-preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--leaf);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+.form-animal-preview img {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(27,67,50,.15);
+  background: var(--surface-alt);
+  flex-shrink: 0;
+}
+.form-animal-preview-info small {
+  display: block;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--forest-mid);
+  margin-bottom: 3px;
+}
+.form-animal-preview-info strong {
+  display: block;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.05rem;
+  color: var(--forest);
+  font-weight: 700;
+}
+
 /* HELP WIDGET */
 .help-widget {
   position: fixed;
@@ -858,9 +908,12 @@ body {
       </button>
 
       <h2 class="form-title">Quero adotar um amigo</h2>
-      <div id="animal-selecionado" hidden style="display:flex;align-items:center;gap:10px;background:var(--leaf);border:1.5px solid var(--border);border-radius:12px;padding:10px 16px;margin-bottom:12px;font-size:.92rem;color:var(--forest);font-weight:600;">
-        <span style="font-size:1.3rem;">🐾</span>
-        <span>Animal de interesse: <strong id="animal-nome"></strong></span>
+      <div id="animal-selecionado" hidden class="form-animal-preview">
+        <img id="animal-preview-img" src="" alt="">
+        <div class="form-animal-preview-info">
+          <small>Animal de interesse</small>
+          <strong id="animal-nome"></strong>
+        </div>
       </div>
       <p class="form-hint">Preencha seus dados abaixo. Um de nossos atendentes do <strong>PARAISO</strong> entrará em contato via WhatsApp para dar continuidade ao processo.</p>
 
@@ -879,7 +932,7 @@ body {
           <div class="field">
             <label for="f-wa">WhatsApp</label>
             <input type="tel" id="f-wa" placeholder="(00) 00000-0000" autocomplete="tel" inputmode="numeric">
-            <span class="field-error">Informe seu WhatsApp</span>
+            <span class="field-error">Informe um WhatsApp válido com DDD (ex: (21) 99999-9999)</span>
           </div>
           <div class="field">
             <label for="f-animal">Animal de interesse</label>
@@ -1064,13 +1117,22 @@ body {
       .catch(() => {});
   });
 
+  const ANIMAL_IMGS = {
+    'Chihuahua': 'chihuahua.png', 'Poodle': 'poodle.webp', 'Shih Tzu': 'shihtzu.jpg',
+    'Bulldog': 'bulldog.avif', 'Spitz Alemão': 'spitz.jpg', 'Pequinês': 'pekinese.jpg',
+    'Papillon': 'papillon.jpg', 'Maltês': 'maltese.webp',
+    'British Shorthair': 'british.jpg', 'Bengal': 'bengal.jpg',
+    'Maine Coon': 'mainecoon.avif', 'Siamês': 'siames.jpg',
+  };
+
   let animalEscolhido = '';
 
   function selectAnimal(nome) {
     animalEscolhido = nome;
     document.getElementById('animal-nome').textContent = nome;
+    const previewImg = document.getElementById('animal-preview-img');
+    if (previewImg && ANIMAL_IMGS[nome]) { previewImg.src = ANIMAL_IMGS[nome]; previewImg.alt = nome; }
     document.getElementById('animal-selecionado').hidden = false;
-    // Pré-seleciona no dropdown
     const sel = document.getElementById('f-animal');
     if (sel) sel.value = nome;
     showForm();
@@ -1126,14 +1188,13 @@ body {
     const animal = animalEl.value;
 
     let valid = true;
-    [{ el: nameEl, val: name }, { el: addrEl, val: addr }, { el: waEl, val: wa }, { el: animalEl, val: animal }].forEach(({ el, val }) => {
-      if (!val) {
-        el.classList.add('invalid');
-        valid = false;
-      } else {
-        el.classList.remove('invalid');
-      }
+    [{ el: nameEl, val: name }, { el: addrEl, val: addr }, { el: animalEl, val: animal }].forEach(({ el, val }) => {
+      if (!val) { el.classList.add('invalid'); valid = false; }
+      else el.classList.remove('invalid');
     });
+    const waDigits = wa.replace(/\D/g, '');
+    if (waDigits.length < 10) { waEl.classList.add('invalid'); valid = false; }
+    else waEl.classList.remove('invalid');
 
     if (!valid) {
       const inv = document.querySelector('.field input.invalid, .field select.invalid');
