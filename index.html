@@ -153,6 +153,20 @@ body {
   display: block; margin: 18px auto 0; background: none; border: none;
   color: var(--muted); font-size: .82rem; cursor: pointer; text-decoration: underline;
 }
+/* ── PIX QR SCREEN ── */
+.pix-screen { text-align: center; }
+.pix-screen h3 { font-size: 1.1rem; font-weight: 700; color: var(--forest); margin-bottom: 4px; }
+.pix-screen .pix-valor { font-size: 2rem; font-weight: 800; color: var(--forest); margin-bottom: 16px; font-variant-numeric: tabular-nums; }
+.pix-qr-img { width: 180px; height: 180px; border-radius: 12px; border: 2px solid var(--border); margin: 0 auto 16px; display: block; }
+.pix-copia { background: var(--surface-alt); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: .72rem; word-break: break-all; color: var(--muted); text-align: left; margin-bottom: 14px; max-height: 72px; overflow: hidden; }
+.btn-copiar-pix { width: 100%; padding: 13px; background: var(--forest); color: white; border: none; border-radius: 12px; font-size: .95rem; font-weight: 700; cursor: pointer; transition: background .15s; margin-bottom: 8px; }
+.btn-copiar-pix:hover { background: var(--forest-mid); }
+.btn-copiar-pix.copiado { background: #22c55e; }
+.pix-info { font-size: .78rem; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+.doe-loading { text-align: center; padding: 40px 0; color: var(--muted); }
+.doe-loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--forest); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 14px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.doe-error { background: #fde8e4; color: var(--coral-dk); border-radius: 12px; padding: 14px; font-size: .86rem; text-align: center; margin: 10px 0; }
 .hdr-logo {
   height: 80px;
   width: auto;
@@ -1039,30 +1053,64 @@ body {
 <!-- MODAL DOAÇÃO -->
 <div class="modal-doe" id="modal-doe" hidden>
   <div class="modal-doe-inner">
-    <h2>💚 Faça uma Doação</h2>
-    <p>Sua contribuição ajuda a resgatar, tratar e encontrar lares para cães e gatos. Escolha um valor:</p>
-    <div class="doe-valores">
-      <div class="doe-val" onclick="doareValor(5)">
-        <strong>R$ 5</strong><span>Um gesto de amor</span>
+
+    <!-- Tela 1: escolha de valor -->
+    <div id="doe-tela-valores">
+      <h2>💚 Faça uma Doação</h2>
+      <p>Sua contribuição ajuda a resgatar, tratar e encontrar lares para cães e gatos. Escolha um valor:</p>
+      <div class="doe-valores">
+        <div class="doe-val" onclick="doareValor(5)">
+          <strong>R$ 5</strong><span>Um gesto de amor</span>
+        </div>
+        <div class="doe-val" onclick="doareValor(10)">
+          <strong>R$ 10</strong><span>Ajuda com ração</span>
+        </div>
+        <div class="doe-val" onclick="doareValor(20)">
+          <strong>R$ 20</strong><span>Vacina preventiva</span>
+        </div>
+        <div class="doe-val" onclick="doareValor(50)">
+          <strong>R$ 50</strong><span>Consulta veterinária</span>
+        </div>
+        <div class="doe-val" onclick="doareValor(100)">
+          <strong>R$ 100</strong><span>Castração + vacinas</span>
+        </div>
+        <div class="doe-val" onclick="doareValor(200)">
+          <strong>R$ 200</strong><span>Padrinho do mês</span>
+        </div>
       </div>
-      <div class="doe-val" onclick="doareValor(10)">
-        <strong>R$ 10</strong><span>Ajuda com ração</span>
-      </div>
-      <div class="doe-val" onclick="doareValor(20)">
-        <strong>R$ 20</strong><span>Vacina preventiva</span>
-      </div>
-      <div class="doe-val" onclick="doareValor(50)">
-        <strong>R$ 50</strong><span>Consulta veterinária</span>
-      </div>
-      <div class="doe-val" onclick="doareValor(100)">
-        <strong>R$ 100</strong><span>Castração + vacinas</span>
-      </div>
-      <div class="doe-val" onclick="doareValor(200)">
-        <strong>R$ 200</strong><span>Padrinho do mês</span>
+      <button class="btn-doe-outros" onclick="doareOutro()">💬 Outros valores — falar com a equipe</button>
+      <button class="btn-fechar-doe" onclick="fecharDoacao()">Fechar</button>
+    </div>
+
+    <!-- Tela 2: carregando -->
+    <div id="doe-tela-loading" hidden>
+      <div class="doe-loading">
+        <div class="doe-loading-spinner"></div>
+        <p>Gerando seu PIX...</p>
       </div>
     </div>
-    <button class="btn-doe-outros" onclick="doareOutro()">💬 Outros valores — falar com a equipe</button>
-    <button class="btn-fechar-doe" onclick="fecharDoacao()">Fechar</button>
+
+    <!-- Tela 3: QR Code PIX -->
+    <div id="doe-tela-pix" hidden>
+      <div class="pix-screen">
+        <h3>Escaneie o QR Code para pagar</h3>
+        <div class="pix-valor" id="pix-valor-txt">R$ —</div>
+        <img class="pix-qr-img" id="pix-qr-img" src="" alt="QR Code PIX">
+        <p class="pix-info">Abra seu banco, vá em <strong>Pix → Pagar → QR Code</strong> ou use o código abaixo:</p>
+        <div class="pix-copia" id="pix-copia-txt"></div>
+        <button class="btn-copiar-pix" id="btn-copiar-pix" onclick="copiarPix()">📋 Copiar código PIX</button>
+        <p class="pix-info" style="font-size:.74rem">O pagamento é identificado automaticamente. Obrigado pela sua doação! 🐾</p>
+        <button class="btn-fechar-doe" onclick="fecharDoacao()">Fechar</button>
+      </div>
+    </div>
+
+    <!-- Tela 4: erro -->
+    <div id="doe-tela-erro" hidden>
+      <div class="doe-error" id="doe-erro-msg">Não foi possível gerar o PIX. Tente novamente.</div>
+      <button class="btn-doe-outros" style="margin-top:10px" onclick="voltarValores()">← Tentar novamente</button>
+      <button class="btn-fechar-doe" onclick="fecharDoacao()">Fechar</button>
+    </div>
+
   </div>
 </div>
 
@@ -1477,13 +1525,78 @@ body {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
 
   // ── DOAÇÃO ──
-  function abrirDoacao() { document.getElementById('modal-doe').hidden = false; }
-  function fecharDoacao() { document.getElementById('modal-doe').hidden = true; }
-  function doareValor(valor) {
-    const msg = encodeURIComponent(`Olá! 💚 Quero fazer uma doação de R$ ${valor},00 para o PARAÍSO DOS FOCINHOS. Como posso prosseguir?`);
-    window.open(`https://wa.me/5521984207429?text=${msg}`, '_blank');
-    fecharDoacao();
+  let pixCopyPaste = '';
+
+  function abrirDoacao() {
+    voltarValores();
+    document.getElementById('modal-doe').hidden = false;
   }
+  function fecharDoacao() {
+    document.getElementById('modal-doe').hidden = true;
+    voltarValores();
+  }
+  function voltarValores() {
+    document.getElementById('doe-tela-valores').hidden = false;
+    document.getElementById('doe-tela-loading').hidden = true;
+    document.getElementById('doe-tela-pix').hidden     = true;
+    document.getElementById('doe-tela-erro').hidden    = true;
+  }
+  function mostrarTela(tela) {
+    ['valores','loading','pix','erro'].forEach(t =>
+      document.getElementById('doe-tela-' + t).hidden = (t !== tela)
+    );
+  }
+
+  async function doareValor(valor) {
+    mostrarTela('loading');
+    try {
+      const resp = await fetch('/api/criar-cobranca', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: valor, nome: 'Doador', email: 'doador@paraisodosfocinhos.online' }),
+      });
+      const data = await resp.json();
+      if (!resp.ok || !data.pix?.copy_paste) throw new Error(data.error || 'Sem dados PIX');
+
+      pixCopyPaste = data.pix.copy_paste;
+      document.getElementById('pix-valor-txt').textContent = `R$ ${valor},00`;
+      document.getElementById('pix-copia-txt').textContent = pixCopyPaste;
+      const qrImg = document.getElementById('pix-qr-img');
+      if (data.pix.qr_code_base64) {
+        qrImg.src = 'data:image/png;base64,' + data.pix.qr_code_base64;
+        qrImg.hidden = false;
+      } else { qrImg.hidden = true; }
+      const btnCopiar = document.getElementById('btn-copiar-pix');
+      btnCopiar.textContent = '📋 Copiar código PIX';
+      btnCopiar.classList.remove('copiado');
+      mostrarTela('pix');
+    } catch(e) {
+      document.getElementById('doe-erro-msg').textContent = 'Não foi possível gerar o PIX. Tente novamente ou fale com a equipe.';
+      mostrarTela('erro');
+    }
+  }
+
+  function copiarPix() {
+    if (!pixCopyPaste) return;
+    navigator.clipboard.writeText(pixCopyPaste).then(() => {
+      const btn = document.getElementById('btn-copiar-pix');
+      btn.textContent = '✓ Código copiado!';
+      btn.classList.add('copiado');
+      setTimeout(() => { btn.textContent = '📋 Copiar código PIX'; btn.classList.remove('copiado'); }, 3000);
+    }).catch(() => {
+      const area = document.createElement('textarea');
+      area.value = pixCopyPaste;
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand('copy');
+      document.body.removeChild(area);
+      const btn = document.getElementById('btn-copiar-pix');
+      btn.textContent = '✓ Código copiado!';
+      btn.classList.add('copiado');
+      setTimeout(() => { btn.textContent = '📋 Copiar código PIX'; btn.classList.remove('copiado'); }, 3000);
+    });
+  }
+
   function doareOutro() {
     const msg = encodeURIComponent('Olá! 💚 Gostaria de fazer uma doação para o PARAÍSO DOS FOCINHOS. Qual a melhor forma?');
     window.open(`https://wa.me/5521984207429?text=${msg}`, '_blank');
