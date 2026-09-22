@@ -441,9 +441,27 @@ body {
 }
 .btn-submit:hover { background: var(--coral-dk); transform: translateY(-1px); }
 .btn-submit:focus-visible { outline: 3px solid var(--coral); outline-offset: 3px; }
-.field input.invalid { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(224,92,58,.12); }
+.field input.invalid, .field select.invalid { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(224,92,58,.12); }
 .field-error { font-size: .76rem; color: var(--coral); margin-top: 5px; display: none; }
-.field input.invalid + .field-error { display: block; }
+.field input.invalid + .field-error, .field select.invalid + .field-error { display: block; }
+.field select {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  font-size: .97rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--surface-alt);
+  color: var(--ink);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%235E7366' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.field select:focus { outline: none; border-color: var(--forest-mid); box-shadow: 0 0 0 3px rgba(45,106,79,.12); }
+.field select option[value=""] { color: var(--muted); }
 
 /* MODAL */
 .modal-bd {
@@ -863,6 +881,30 @@ body {
             <input type="tel" id="f-wa" placeholder="(00) 00000-0000" autocomplete="tel" inputmode="numeric">
             <span class="field-error">Informe seu WhatsApp</span>
           </div>
+          <div class="field">
+            <label for="f-animal">Animal de interesse</label>
+            <select id="f-animal">
+              <option value="">Selecione um animal...</option>
+              <optgroup label="🐶 Cães">
+                <option value="Chihuahua">Chihuahua</option>
+                <option value="Poodle">Poodle</option>
+                <option value="Shih Tzu">Shih Tzu</option>
+                <option value="Bulldog">Bulldog</option>
+                <option value="Spitz Alemão">Spitz Alemão</option>
+                <option value="Pequinês">Pequinês</option>
+                <option value="Papillon">Papillon</option>
+                <option value="Maltês">Maltês</option>
+              </optgroup>
+              <optgroup label="🐱 Gatos">
+                <option value="British Shorthair">British Shorthair</option>
+                <option value="Bengal">Bengal</option>
+                <option value="Maine Coon">Maine Coon</option>
+                <option value="Siamês">Siamês</option>
+              </optgroup>
+              <option value="Outro">Outro</option>
+            </select>
+            <span class="field-error">Selecione um animal</span>
+          </div>
           <button type="submit" class="btn-submit">Enviar Cadastro</button>
         </form>
 
@@ -1004,6 +1046,9 @@ body {
     animalEscolhido = nome;
     document.getElementById('animal-nome').textContent = nome;
     document.getElementById('animal-selecionado').hidden = false;
+    // Pré-seleciona no dropdown
+    const sel = document.getElementById('f-animal');
+    if (sel) sel.value = nome;
     showForm();
   }
 
@@ -1022,7 +1067,8 @@ body {
     document.getElementById('form-sucesso').hidden = true;
     document.getElementById('animal-selecionado').hidden = true;
     animalEscolhido = '';
-    ['f-name','f-addr','f-wa'].forEach(id => document.getElementById(id).classList.remove('invalid'));
+    ['f-name','f-addr','f-wa','f-animal'].forEach(id => document.getElementById(id).classList.remove('invalid'));
+    document.getElementById('f-animal').value = '';
     window.scrollTo({ top: 0 });
   }
 
@@ -1049,12 +1095,14 @@ body {
     const addrEl = document.getElementById('f-addr');
     const waEl   = document.getElementById('f-wa');
 
-    const name = nameEl.value.trim();
-    const addr = addrEl.value.trim();
-    const wa   = waEl.value.trim();
+    const animalEl = document.getElementById('f-animal');
+    const name   = nameEl.value.trim();
+    const addr   = addrEl.value.trim();
+    const wa     = waEl.value.trim();
+    const animal = animalEl.value;
 
     let valid = true;
-    [{ el: nameEl, val: name }, { el: addrEl, val: addr }, { el: waEl, val: wa }].forEach(({ el, val }) => {
+    [{ el: nameEl, val: name }, { el: addrEl, val: addr }, { el: waEl, val: wa }, { el: animalEl, val: animal }].forEach(({ el, val }) => {
       if (!val) {
         el.classList.add('invalid');
         valid = false;
@@ -1064,7 +1112,8 @@ body {
     });
 
     if (!valid) {
-      document.querySelector('.field input.invalid').focus();
+      const inv = document.querySelector('.field input.invalid, .field select.invalid');
+      if (inv) inv.focus();
       return;
     }
 
@@ -1073,7 +1122,7 @@ body {
       nome: name,
       endereco: addr,
       whatsapp: wa,
-      animal: animalEscolhido || '—'
+      animal: animal
     }).then(({ error }) => {
       if (error) console.error('Erro Supabase:', error.message);
     });
