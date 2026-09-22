@@ -1450,7 +1450,7 @@ body {
     this.value = v;
   });
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const nameEl = document.getElementById('f-name');
     const addrEl = document.getElementById('f-addr');
@@ -1491,14 +1491,16 @@ body {
     }
 
     // Salva no Supabase
-    db.from('cadastros').insert({
+    const { error: errInsert } = await db.from('cadastros').insert({
       nome: name,
       endereco: addr,
       whatsapp: wa,
-      animal: animal
-    }).then(({ error }) => {
-      if (error) console.error('Erro Supabase:', error.message);
+      animal: animal,
+      data: new Date().toISOString()
     });
+    if (errInsert) {
+      console.error('Erro Supabase:', errInsert.message);
+    }
 
     // Mostra tela de sucesso e abre WhatsApp simultaneamente
     document.getElementById('adopt-form').hidden = true;
