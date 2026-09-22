@@ -261,7 +261,7 @@ body {
 .radio-opt:hover + .radio-item-hint,
 .radio-item:hover .radio-item-hint { border-color: var(--green-light); background: var(--surface); }
 .radio-item:hover .radio-opt { border-color: var(--green-light); }
-.radio-opt input[type="radio"] { accent-color: var(--forest); flex-shrink: 0; }
+.radio-opt input[type="checkbox"] { accent-color: var(--forest); flex-shrink: 0; width: 16px; height: 16px; cursor: pointer; }
 .radio-opt.checked { border-color: var(--forest); background: var(--leaf); }
 .radio-item.checked-item .radio-item-hint {
   border-color: var(--forest);
@@ -473,28 +473,28 @@ body {
           <div class="radio-item">
             <p class="radio-item-hint"><strong>Sim — tenho espaço amplo</strong><br>Quintal, varanda grande ou área exclusiva para o animal.</p>
             <label class="radio-opt" onclick="marcarOpcao(this)">
-              <input type="radio" name="local" value="sim_espaco">
+              <input type="checkbox" name="local" value="sim_espaco">
               <span class="radio-opt-label">Marcar esta opção</span>
             </label>
           </div>
           <div class="radio-item">
             <p class="radio-item-hint"><strong>Sim — apartamento adaptado</strong><br>Ambiente seguro, telas nas janelas e espaço para o porte do animal.</p>
             <label class="radio-opt" onclick="marcarOpcao(this)">
-              <input type="radio" name="local" value="sim_apartamento">
+              <input type="checkbox" name="local" value="sim_apartamento">
               <span class="radio-opt-label">Marcar esta opção</span>
             </label>
           </div>
           <div class="radio-item">
             <p class="radio-item-hint"><strong>Estou adaptando a casa</strong><br>Em processo de preparar o ambiente para receber o pet.</p>
             <label class="radio-opt" onclick="marcarOpcao(this)">
-              <input type="radio" name="local" value="nao_adaptando">
+              <input type="checkbox" name="local" value="nao_adaptando">
               <span class="radio-opt-label">Marcar esta opção</span>
             </label>
           </div>
           <div class="radio-item">
             <p class="radio-item-hint"><strong>Ainda não tenho</strong><br>Nossa equipe poderá orientar sobre as adaptações necessárias.</p>
             <label class="radio-opt" onclick="marcarOpcao(this)">
-              <input type="radio" name="local" value="nao">
+              <input type="checkbox" name="local" value="nao">
               <span class="radio-opt-label">Marcar esta opção</span>
             </label>
           </div>
@@ -550,11 +550,15 @@ body {
   });
 
   function marcarOpcao(el) {
-    document.querySelectorAll('.radio-opt').forEach(o => o.classList.remove('checked'));
-    document.querySelectorAll('.radio-item').forEach(o => o.classList.remove('checked-item'));
-    el.classList.add('checked');
-    el.closest('.radio-item')?.classList.add('checked-item');
-    document.getElementById('local-erro').style.display = 'none';
+    const cb = el.querySelector('input[type="checkbox"]');
+    // O click no label já toggle o checkbox — sincroniza o visual
+    setTimeout(() => {
+      const marcado = cb.checked;
+      el.classList.toggle('checked', marcado);
+      el.closest('.radio-item')?.classList.toggle('checked-item', marcado);
+      const algum = document.querySelector('input[name="local"]:checked');
+      if (algum) document.getElementById('local-erro').style.display = 'none';
+    }, 0);
   }
 
   function campo(id) { return document.getElementById(id); }
@@ -586,7 +590,7 @@ body {
       nome_tutor:  campo('f-tutor').value.trim(),
       telefone:    campo('f-tel').value.trim(),
       endereco:    campo('f-end').value.trim(),
-      local_casa:  document.querySelector('input[name="local"]:checked').value,
+      local_casa:  Array.from(document.querySelectorAll('input[name="local"]:checked')).map(c => c.value).join(', '),
       criado_em:   new Date().toISOString(),
     };
 
