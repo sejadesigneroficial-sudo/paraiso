@@ -1158,15 +1158,6 @@ body {
     window.scrollTo({ top: 0 });
   }
 
-  function closeModal() {
-    document.getElementById('modal').hidden = true;
-  }
-  document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
-
-  document.getElementById('modal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-  });
-
   document.getElementById('f-wa').addEventListener('input', function() {
     let v = this.value.replace(/\D/g, '').slice(0, 11);
     if (v.length > 7) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
