@@ -965,6 +965,19 @@ body {
     } catch(e) {}
   })();
 
+  // Presença em tempo real — mostra quem está online agora
+  (function rastrearPresenca() {
+    try {
+      if (localStorage.getItem('pf_adm_device') === '1') return;
+      const canal = db.channel('presenca-site');
+      canal.subscribe(async status => {
+        if (status === 'SUBSCRIBED') {
+          await canal.track({ entrou: new Date().toISOString() });
+        }
+      });
+    } catch(e) {}
+  })();
+
   // Tab switch
   function switchTab(tab) {
     document.getElementById('panel-caes').hidden  = tab !== 'caes';
