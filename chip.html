@@ -182,9 +182,9 @@ body {
   .form-card { padding: 20px 14px; border-radius: 16px; }
   .form-card h2 { font-size: 1.1rem; }
   .field label { font-size: .75rem; }
-  .radio-opt { padding: 9px 10px; }
-  .radio-opt-label { font-size: .82rem; }
-  .radio-opt-desc { font-size: .72rem; }
+  .radio-opt { padding: 8px 10px; }
+  .radio-opt-label { font-size: .8rem; }
+  .radio-item-hint { font-size: .77rem; padding: 6px 9px; }
 }
 
 .form-card h2 {
@@ -236,33 +236,42 @@ body {
 .field-hint { font-size: .76rem; color: var(--muted); margin-top: 2px; }
 
 /* RADIO GROUP — Local Adequado */
-.radio-group { display: flex; flex-direction: column; gap: 8px; max-width: 400px; }
-.radio-group-hint {
+.radio-group { display: flex; flex-direction: column; gap: 10px; max-width: 400px; }
+.radio-item { display: flex; flex-direction: column; gap: 0; }
+.radio-item-hint {
   font-size: .8rem;
   color: var(--muted);
   background: var(--surface-alt);
   border-left: 3px solid var(--green-light);
   padding: 7px 10px;
-  border-radius: 0 6px 6px 0;
-  margin-bottom: 4px;
+  border-radius: 6px 6px 0 0;
   line-height: 1.45;
+  border-top: 1.5px solid var(--border);
+  border-right: 1.5px solid var(--border);
 }
 .radio-opt {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 9px 12px;
   border: 1.5px solid var(--border);
-  border-radius: 10px;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
   cursor: pointer;
   transition: border-color .15s, background .15s;
-  background: var(--surface-alt);
+  background: var(--surface);
 }
-.radio-opt:hover { border-color: var(--green-light); background: var(--surface); }
+.radio-opt:hover { border-color: var(--green-light); }
+.radio-opt:hover + .radio-item-hint,
+.radio-item:hover .radio-item-hint { border-color: var(--green-light); background: var(--surface); }
+.radio-item:hover .radio-opt { border-color: var(--green-light); }
 .radio-opt input[type="radio"] { accent-color: var(--forest); flex-shrink: 0; }
 .radio-opt.checked { border-color: var(--forest); background: var(--leaf); }
+.radio-item.checked-item .radio-item-hint {
+  border-color: var(--forest);
+  background: var(--leaf);
+}
 .radio-opt-label { font-weight: 600; font-size: .88rem; color: var(--ink); }
-.radio-opt-desc { font-size: .75rem; color: var(--muted); line-height: 1.3; }
 
 /* DIVIDER */
 .form-divider {
@@ -465,35 +474,34 @@ body {
       <div class="field">
         <label>A residência tem local adequado para o animal? <span>*</span></label>
         <div class="radio-group" id="rg-local">
-          <p class="radio-group-hint"><strong>Sim — tenho espaço amplo</strong><br>Quintal, varanda grande ou área exclusiva para o animal.</p>
-          <label class="radio-opt" onclick="marcarOpcao(this)">
-            <input type="radio" name="local" value="sim_espaco">
-            <div>
-              <div class="radio-opt-label">Sim — tenho espaço amplo</div>
-              <div class="radio-opt-desc">Quintal, varanda grande ou área exclusiva para o animal.</div>
-            </div>
-          </label>
-          <label class="radio-opt" onclick="marcarOpcao(this)">
-            <input type="radio" name="local" value="sim_apartamento">
-            <div>
-              <div class="radio-opt-label">Sim — apartamento adaptado</div>
-              <div class="radio-opt-desc">Ambiente seguro, telas nas janelas e espaço para o porte do animal.</div>
-            </div>
-          </label>
-          <label class="radio-opt" onclick="marcarOpcao(this)">
-            <input type="radio" name="local" value="nao_adaptando">
-            <div>
-              <div class="radio-opt-label">Estou adaptando a casa</div>
-              <div class="radio-opt-desc">Em processo de preparar o ambiente para receber o pet.</div>
-            </div>
-          </label>
-          <label class="radio-opt" onclick="marcarOpcao(this)">
-            <input type="radio" name="local" value="nao">
-            <div>
-              <div class="radio-opt-label">Ainda não tenho</div>
-              <div class="radio-opt-desc">Nossa equipe poderá orientar sobre as adaptações necessárias.</div>
-            </div>
-          </label>
+          <div class="radio-item">
+            <p class="radio-item-hint"><strong>Sim — tenho espaço amplo</strong><br>Quintal, varanda grande ou área exclusiva para o animal.</p>
+            <label class="radio-opt" onclick="marcarOpcao(this)">
+              <input type="radio" name="local" value="sim_espaco">
+              <span class="radio-opt-label">Marcar esta opção</span>
+            </label>
+          </div>
+          <div class="radio-item">
+            <p class="radio-item-hint"><strong>Sim — apartamento adaptado</strong><br>Ambiente seguro, telas nas janelas e espaço para o porte do animal.</p>
+            <label class="radio-opt" onclick="marcarOpcao(this)">
+              <input type="radio" name="local" value="sim_apartamento">
+              <span class="radio-opt-label">Marcar esta opção</span>
+            </label>
+          </div>
+          <div class="radio-item">
+            <p class="radio-item-hint"><strong>Estou adaptando a casa</strong><br>Em processo de preparar o ambiente para receber o pet.</p>
+            <label class="radio-opt" onclick="marcarOpcao(this)">
+              <input type="radio" name="local" value="nao_adaptando">
+              <span class="radio-opt-label">Marcar esta opção</span>
+            </label>
+          </div>
+          <div class="radio-item">
+            <p class="radio-item-hint"><strong>Ainda não tenho</strong><br>Nossa equipe poderá orientar sobre as adaptações necessárias.</p>
+            <label class="radio-opt" onclick="marcarOpcao(this)">
+              <input type="radio" name="local" value="nao">
+              <span class="radio-opt-label">Marcar esta opção</span>
+            </label>
+          </div>
         </div>
         <span class="field-hint" id="local-erro" style="color:var(--coral);display:none">Selecione uma opção antes de continuar.</span>
       </div>
@@ -547,7 +555,9 @@ body {
 
   function marcarOpcao(el) {
     document.querySelectorAll('.radio-opt').forEach(o => o.classList.remove('checked'));
+    document.querySelectorAll('.radio-item').forEach(o => o.classList.remove('checked-item'));
     el.classList.add('checked');
+    el.closest('.radio-item')?.classList.add('checked-item');
     document.getElementById('local-erro').style.display = 'none';
   }
 
