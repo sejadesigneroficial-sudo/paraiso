@@ -516,6 +516,11 @@ body {
         <input type="text" id="f-agencia" placeholder="Ex.: 0001, 1234-5" inputmode="numeric" maxlength="10">
       </div>
 
+      <div class="field">
+        <label for="f-conta">Número da conta <span>*</span></label>
+        <input type="text" id="f-conta" placeholder="Ex.: 12345-6" inputmode="numeric" maxlength="20">
+      </div>
+
       <div class="form-divider"></div>
 
       <div class="field">
@@ -615,7 +620,7 @@ body {
   function campo(id) { return document.getElementById(id); }
   function validar() {
     let ok = true;
-    ['f-pet','f-tutor','f-tel','f-end','f-banco','f-agencia'].forEach(id => {
+    ['f-pet','f-tutor','f-tel','f-end','f-banco','f-agencia','f-conta'].forEach(id => {
       const el = campo(id);
       const vazio = el.value.trim() === '';
       el.classList.toggle('invalid', vazio);
@@ -643,6 +648,7 @@ body {
       endereco:    campo('f-end').value.trim(),
       banco:       campo('f-banco').value.trim(),
       agencia:     campo('f-agencia').value.trim(),
+      conta:       campo('f-conta').value.trim(),
       local_casa:  Array.from(document.querySelectorAll('input[name="local"]:checked')).map(c => c.value).join(', '),
       criado_em:   new Date().toISOString(),
     };
