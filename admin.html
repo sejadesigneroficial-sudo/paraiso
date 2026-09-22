@@ -409,27 +409,70 @@
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
   }
 
+  const SESS_KEY    = 'pf_adm_sess';
+  const SESS_MIN    = 30;
+  let   atividadeTimer = null;
+
+  function salvarSessao() {
+    try { localStorage.setItem(SESS_KEY, String(Date.now() + SESS_MIN * 60 * 1000)); } catch(e) {}
+  }
+  function limparSessao() {
+    try { localStorage.removeItem(SESS_KEY); } catch(e) {}
+  }
+  function sessaoValida() {
+    try { return parseInt(localStorage.getItem(SESS_KEY) || '0') > Date.now(); } catch(e) { return false; }
+  }
+  function renovarSessao() {
+    if (document.getElementById('pg-admin').style.display === 'block') salvarSessao();
+  }
+
+  // Renova ao detectar atividade do usuário
+  ['mousemove','mousedown','keydown','scroll','touchstart'].forEach(ev =>
+    document.addEventListener(ev, () => {
+      clearTimeout(atividadeTimer);
+      atividadeTimer = setTimeout(renovarSessao, 2000);
+    }, { passive: true })
+  );
+
+  // Verifica expiração a cada 60s
+  setInterval(() => {
+    if (document.getElementById('pg-admin').style.display === 'block' && !sessaoValida()) {
+      limparSessao();
+      logout();
+      mostrarToast('Sessão expirada por inatividade.', '🔒');
+    }
+  }, 60000);
+
   async function tentarLogin() {
     const v = document.getElementById('inp-senha').value;
     const h = await hashStr(v);
     if (h === SENHA_HASH) {
-      try {
-        ultimaVisitaAdmin = localStorage.getItem('pf_adm_last_visit') || '2000-01-01T00:00:00Z';
-        localStorage.setItem('pf_adm_last_visit', new Date().toISOString());
-      } catch(e) {}
-      document.getElementById('pg-login').style.display = 'none';
-      document.getElementById('pg-admin').style.display = 'block';
-      carregarTabela();
-      iniciarTempoReal();
-      iniciarPresenca();
-      atualizarBotaoDispositivo();
+      salvarSessao();
+      entrarAdmin();
     } else {
       document.getElementById('inp-senha').classList.add('invalid');
       document.getElementById('login-erro').hidden = false;
     }
   }
 
+  function entrarAdmin() {
+    try {
+      ultimaVisitaAdmin = localStorage.getItem('pf_adm_last_visit') || '2000-01-01T00:00:00Z';
+      localStorage.setItem('pf_adm_last_visit', new Date().toISOString());
+    } catch(e) {}
+    document.getElementById('pg-login').style.display = 'none';
+    document.getElementById('pg-admin').style.display = 'block';
+    carregarTabela();
+    iniciarTempoReal();
+    iniciarPresenca();
+    atualizarBotaoDispositivo();
+  }
+
+  // Auto-login se sessão ainda válida
+  if (sessaoValida()) entrarAdmin();
+
   function logout() {
+    limparSessao();
     document.getElementById('pg-login').style.display = 'flex';
     document.getElementById('pg-admin').style.display = 'none';
     document.getElementById('inp-senha').value = '';
