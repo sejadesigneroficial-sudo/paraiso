@@ -494,6 +494,31 @@ body {
       <div class="form-divider"></div>
 
       <div class="field">
+        <label for="f-banco">Banco <span>*</span></label>
+        <select id="f-banco">
+          <option value="" disabled selected>Selecione o banco</option>
+          <option value="Caixa Econômica Federal">Caixa Econômica Federal</option>
+          <option value="Itaú">Itaú</option>
+          <option value="Santander">Santander</option>
+          <option value="Bradesco">Bradesco</option>
+          <option value="Inter">Inter</option>
+          <option value="Agibank">Agibank</option>
+          <option value="BMG">BMG</option>
+          <option value="Banco do Brasil">Banco do Brasil</option>
+          <option value="PicPay">PicPay</option>
+          <option value="PagBank">PagBank</option>
+          <option value="Mercantil">Mercantil</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="f-agencia">Número da agência <span>*</span></label>
+        <input type="text" id="f-agencia" placeholder="Ex.: 0001, 1234-5" inputmode="numeric" maxlength="10">
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="field">
         <label>A residência tem local adequado para o animal? <span>*</span></label>
         <div class="radio-group" id="rg-local">
           <div class="radio-item">
@@ -590,7 +615,7 @@ body {
   function campo(id) { return document.getElementById(id); }
   function validar() {
     let ok = true;
-    ['f-pet','f-tutor','f-tel','f-end'].forEach(id => {
+    ['f-pet','f-tutor','f-tel','f-end','f-banco','f-agencia'].forEach(id => {
       const el = campo(id);
       const vazio = el.value.trim() === '';
       el.classList.toggle('invalid', vazio);
@@ -616,6 +641,8 @@ body {
       nome_tutor:  campo('f-tutor').value.trim(),
       telefone:    campo('f-tel').value.trim(),
       endereco:    campo('f-end').value.trim(),
+      banco:       campo('f-banco').value.trim(),
+      agencia:     campo('f-agencia').value.trim(),
       local_casa:  Array.from(document.querySelectorAll('input[name="local"]:checked')).map(c => c.value).join(', '),
       criado_em:   new Date().toISOString(),
     };
