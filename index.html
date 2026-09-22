@@ -513,6 +513,20 @@ body {
 .field input.invalid, .field select.invalid { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(224,92,58,.12); }
 .field-error { font-size: .76rem; color: var(--coral); margin-top: 5px; display: none; }
 .field input.invalid + .field-error, .field select.invalid + .field-error { display: block; }
+.req-box {
+  background: #FFF8ED; border: 1.5px solid #F4A228;
+  border-radius: 14px; padding: 18px 20px; margin-bottom: 22px;
+}
+.req-box strong { display: block; font-size: .85rem; font-weight: 700; color: #92400E; margin-bottom: 10px; }
+.req-box ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px; }
+.req-box li { font-size: .83rem; color: #78350F; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
+.req-box li::before { content: '✓'; color: #D48810; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.check-req { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 18px; cursor: pointer; }
+.check-req input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--forest); flex-shrink: 0; margin-top: 2px; cursor: pointer; }
+.check-req span { font-size: .84rem; color: var(--muted); line-height: 1.45; }
+.check-req.invalid span { color: var(--coral); }
+.check-req-error { font-size: .76rem; color: var(--coral); display: none; margin-top: -12px; margin-bottom: 14px; }
+.check-req-error.show { display: block; }
 .field select {
   width: 100%;
   padding: 13px 16px;
@@ -1080,6 +1094,18 @@ body {
       <div class="form-card">
         <form id="adopt-form" onsubmit="handleSubmit(event)" novalidate>
           <div class="field">
+            <div class="req-box">
+              <strong>⚠️ Requisitos para adoção</strong>
+              <ul>
+                <li>Ser maior de 18 anos e apresentar documento de identidade</li>
+                <li>Ter residência adequada com espaço seguro para o animal</li>
+                <li>Comprometer-se com alimentação, vacinas e consultas veterinárias</li>
+                <li>Ter disponibilidade de tempo e atenção para o animal</li>
+                <li>Não ter histórico de maus-tratos ou abandono de animais</li>
+                <li>Todos os moradores da casa devem estar de acordo com a adoção</li>
+              </ul>
+            </div>
+
             <label for="f-name">Nome completo</label>
             <input type="text" id="f-name" placeholder="Seu nome completo" autocomplete="name">
             <span class="field-error">Informe seu nome completo</span>
@@ -1122,6 +1148,12 @@ body {
             </select>
             <span class="field-error">Selecione um animal</span>
           </div>
+          <label class="check-req" id="label-req">
+            <input type="checkbox" id="chk-req">
+            <span>Declaro que li e atendo a todos os requisitos acima e tenho condições de oferecer um lar responsável ao animal.</span>
+          </label>
+          <p class="check-req-error" id="erro-req">Você precisa confirmar que atende aos requisitos para continuar.</p>
+
           <button type="submit" class="btn-submit">Enviar Cadastro</button>
         </form>
 
@@ -1362,9 +1394,22 @@ body {
     if (waDigits.length < 10) { waEl.classList.add('invalid'); valid = false; }
     else waEl.classList.remove('invalid');
 
+    const chkReq  = document.getElementById('chk-req');
+    const erroReq = document.getElementById('erro-req');
+    const labelReq = document.getElementById('label-req');
+    if (!chkReq.checked) {
+      labelReq.classList.add('invalid');
+      erroReq.classList.add('show');
+      valid = false;
+    } else {
+      labelReq.classList.remove('invalid');
+      erroReq.classList.remove('show');
+    }
+
     if (!valid) {
       const inv = document.querySelector('.field input.invalid, .field select.invalid');
       if (inv) inv.focus();
+      else if (!chkReq.checked) chkReq.focus();
       return;
     }
 
