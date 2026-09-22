@@ -1006,14 +1006,19 @@ body {
         </form>
 
         <!-- Sucesso -->
-        <div id="form-sucesso" hidden style="text-align:center;padding:32px 16px;">
-          <div style="width:64px;height:64px;background:var(--leaf);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <div id="form-sucesso" hidden style="text-align:center;padding:36px 16px;">
+          <div style="width:68px;height:68px;background:var(--leaf);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
               <path d="M7 16l7 7 11-12" stroke="#1B4332" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <h3 style="font-family:'Fraunces',Georgia,serif;color:var(--forest);font-size:1.3rem;margin-bottom:8px;">Cadastro recebido!</h3>
-          <p style="color:var(--muted);font-size:.92rem;line-height:1.5;margin-bottom:24px;">Seus dados foram salvos com sucesso. Você será direcionado(a) ao WhatsApp da ONG para dar continuidade ao processo de adoção.</p>
+          <h3 style="font-family:'Fraunces',Georgia,serif;color:var(--forest);font-size:1.35rem;margin-bottom:8px;">Cadastro recebido! 🐾</h3>
+          <p style="color:var(--muted);font-size:.92rem;line-height:1.55;margin-bottom:20px;">Seus dados foram salvos com sucesso. Em instantes você será direcionado(a) ao WhatsApp da ONG para continuar o processo de adoção.</p>
+          <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:var(--leaf);border-radius:12px;padding:14px 20px;margin-bottom:22px;">
+            <span style="font-size:.9rem;color:var(--forest);font-weight:600;">Redirecionando para o WhatsApp em</span>
+            <span id="sucesso-contador" style="font-family:'Fraunces',Georgia,serif;font-size:1.6rem;font-weight:900;color:var(--forest);min-width:24px;">3</span>
+            <span style="font-size:.9rem;color:var(--forest);font-weight:600;">seg...</span>
+          </div>
           <button class="btn-submit" style="background:var(--forest);" onclick="showHome()">Voltar ao início</button>
         </div>
       </div>
@@ -1249,15 +1254,31 @@ body {
 
     // Mostra tela de sucesso e abre WhatsApp simultaneamente
     document.getElementById('adopt-form').hidden = true;
-    document.getElementById('form-sucesso').hidden = false;
     document.getElementById('animal-selecionado').hidden = true;
-    window.open(`https://wa.me/${WA}`, '_blank');
+
+    // Mostra sucesso com contador regressivo
+    const sucessoEl = document.getElementById('form-sucesso');
+    const contadorEl = document.getElementById('sucesso-contador');
+    sucessoEl.hidden = false;
+
     try {
       confetti({ particleCount: 140, spread: 85, origin: { y: 0.55 },
         colors: ['#1B4332','#52B788','#F4A228','#E05C3A','#ffffff','#D8F3DC','#95D5B2'] });
       setTimeout(() => confetti({ particleCount: 60, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors: ['#F4A228','#52B788'] }), 320);
       setTimeout(() => confetti({ particleCount: 60, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors: ['#E05C3A','#1B4332'] }), 320);
     } catch(e) {}
+
+    // Contador regressivo 3…2…1 → abre WhatsApp
+    let seg = 3;
+    if (contadorEl) contadorEl.textContent = seg;
+    const timer = setInterval(() => {
+      seg--;
+      if (contadorEl) contadorEl.textContent = seg;
+      if (seg <= 0) {
+        clearInterval(timer);
+        window.open(`https://wa.me/${WA}`, '_blank');
+      }
+    }, 1000);
   }
 
   ['f-name','f-addr','f-wa'].forEach(id => {
