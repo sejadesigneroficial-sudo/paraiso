@@ -843,6 +843,38 @@ body {
         <p class="breed-trait">Doce, gentil e companheiro fiel</p>
         <span class="badge">Disponível</span>
       </div>
+
+      <!-- GOLDEN RETRIEVER -->
+      <div class="card" onclick="selectAnimal('Golden Retriever')">
+        <img class="dog-img" id="dog-golden" alt="Golden Retriever">
+        <p class="breed-name">Golden Retriever</p>
+        <p class="breed-trait">Alegre, paciente e adora crianças</p>
+        <span class="badge">Disponível</span>
+      </div>
+
+      <!-- LABRADOR -->
+      <div class="card" onclick="selectAnimal('Labrador')">
+        <img class="dog-img" id="dog-labrador" alt="Labrador">
+        <p class="breed-name">Labrador</p>
+        <p class="breed-trait">Leal, brincalhão e muito sociável</p>
+        <span class="badge">Disponível</span>
+      </div>
+
+      <!-- YORKSHIRE -->
+      <div class="card" onclick="selectAnimal('Yorkshire')">
+        <img class="dog-img" id="dog-yorkshire" alt="Yorkshire Terrier">
+        <p class="breed-name">Yorkshire</p>
+        <p class="breed-trait">Valente, carinhoso e cheio de energia</p>
+        <span class="badge">Disponível</span>
+      </div>
+
+      <!-- DACHSHUND -->
+      <div class="card" onclick="selectAnimal('Dachshund')">
+        <img class="dog-img" id="dog-dachshund" alt="Dachshund">
+        <p class="breed-name">Dachshund</p>
+        <p class="breed-trait">Curioso, persistente e muito expressivo</p>
+        <span class="badge">Disponível</span>
+      </div>
     </div>
 
     <div style="text-align:center;margin-top:32px;">
@@ -991,6 +1023,10 @@ body {
                 <option value="Pequinês">Pequinês</option>
                 <option value="Papillon">Papillon</option>
                 <option value="Maltês">Maltês</option>
+                <option value="Golden Retriever">Golden Retriever</option>
+                <option value="Labrador">Labrador</option>
+                <option value="Yorkshire">Yorkshire</option>
+                <option value="Dachshund">Dachshund</option>
               </optgroup>
               <optgroup label="🐱 Gatos">
                 <option value="British Shorthair">British Shorthair</option>
@@ -1139,6 +1175,10 @@ body {
     { id: 'dog-pekinese', url: null, src: 'pekinese.jpg' },
     { id: 'dog-papillon', url: null, src: 'papillon.jpg' },
     { id: 'dog-maltese',  url: null, src: 'maltese.webp' },
+    { id: 'dog-golden',    url: null, src: 'golden.jpg' },
+    { id: 'dog-labrador',  url: null, src: 'labrador.jpg' },
+    { id: 'dog-yorkshire', url: null, src: 'yorkshire.jpg' },
+    { id: 'dog-dachshund', url: null, src: 'dachshund.jpg' },
   ];
   dogBreeds.forEach(({ id, url, src }) => {
     const el = document.getElementById(id);
@@ -1170,6 +1210,8 @@ body {
     'Chihuahua': 'chihuahua.png', 'Poodle': 'poodle.webp', 'Shih Tzu': 'shihtzu.jpg',
     'Bulldog': 'bulldog.avif', 'Spitz Alemão': 'spitz.jpg', 'Pequinês': 'pekinese.jpg',
     'Papillon': 'papillon.jpg', 'Maltês': 'maltese.webp',
+    'Golden Retriever': 'golden.jpg', 'Labrador': 'labrador.jpg',
+    'Yorkshire': 'yorkshire.jpg', 'Dachshund': 'dachshund.jpg',
     'British Shorthair': 'british.jpg', 'Bengal': 'bengal.jpg',
     'Maine Coon': 'mainecoon.avif', 'Siamês': 'siames.jpg',
   };
