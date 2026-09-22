@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
@@ -31,37 +31,84 @@
     body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
 
     /* ── LOGIN ── */
-    #pg-login { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
-    .login-box { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 40px 32px; width: 100%; max-width: 380px; text-align: center; }
-    .login-box img { height: 64px; margin-bottom: 20px; mix-blend-mode: multiply; }
-    @media (prefers-color-scheme: dark) { .login-box img { mix-blend-mode: screen; } }
-    .login-box h1 { font-family: 'Fraunces', Georgia, serif; font-size: 1.4rem; color: var(--forest); margin-bottom: 6px; }
-    .login-box p { color: var(--muted); font-size: .9rem; margin-bottom: 24px; }
-    .login-box input { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 1rem; background: var(--surface-alt); color: var(--ink); margin-bottom: 14px; outline: none; }
-    .login-box input:focus { border-color: var(--green-light); }
-    .login-box input.invalid { border-color: var(--coral); }
-    .login-box button { width: 100%; padding: 13px; background: var(--forest); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; }
-    .login-box button:hover { background: var(--forest-mid); }
-    .login-error { color: var(--coral); font-size: .85rem; margin-top: 10px; }
+    #pg-login {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px;
+      background: linear-gradient(145deg, #071410 0%, #1B4332 55%, #2D6A4F 100%);
+      position: relative; overflow: hidden;
+    }
+    #pg-login::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 15% 85%, rgba(82,183,136,.18) 0%, transparent 55%),
+                  radial-gradient(ellipse at 85% 15%, rgba(244,162,40,.1) 0%, transparent 55%);
+    }
+    .login-box {
+      background: rgba(255,255,255,.06); backdrop-filter: blur(20px) saturate(1.4);
+      border: 1px solid rgba(255,255,255,.12); border-radius: 26px;
+      padding: 48px 36px; width: 100%; max-width: 390px; text-align: center;
+      position: relative; z-index: 1; box-shadow: 0 32px 80px rgba(0,0,0,.45);
+      animation: loginEntrada .45s cubic-bezier(.22,.68,0,1.2);
+    }
+    @keyframes loginEntrada { from { transform: translateY(28px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .login-box img { height: 76px; margin-bottom: 24px; mix-blend-mode: screen; }
+    .login-box h1 { font-family: 'Fraunces', Georgia, serif; font-size: 1.5rem; font-weight: 900; color: #B7E4C7; margin-bottom: 6px; }
+    .login-box p { color: rgba(255,255,255,.45); font-size: .88rem; margin-bottom: 30px; }
+    .login-box input {
+      width: 100%; padding: 14px 16px; border: 1.5px solid rgba(255,255,255,.14);
+      border-radius: 12px; font-size: 1rem; font-family: 'DM Sans', sans-serif;
+      background: rgba(255,255,255,.07); color: white; margin-bottom: 12px; outline: none;
+      transition: border-color .2s, background .2s;
+    }
+    .login-box input::placeholder { color: rgba(255,255,255,.28); }
+    .login-box input:focus { border-color: rgba(82,183,136,.7); background: rgba(255,255,255,.1); }
+    .login-box input.invalid { border-color: #E05C3A; }
+    .login-box button {
+      width: 100%; padding: 15px; border: none; border-radius: 12px;
+      background: linear-gradient(135deg, #52B788 0%, #1B4332 100%);
+      color: white; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700;
+      letter-spacing: .04em; cursor: pointer; transition: opacity .15s, transform .15s;
+      box-shadow: 0 6px 20px rgba(27,67,50,.5);
+    }
+    .login-box button:hover { opacity: .88; transform: translateY(-1px); }
+    .login-error { color: #FF7355; font-size: .85rem; margin-top: 12px; }
 
     /* ── ADMIN ── */
     #pg-admin { display: none; }
-    .adm-header { background: var(--forest); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 40; }
-    .adm-header img { height: 48px; mix-blend-mode: screen; }
-    .adm-header-title { color: white; font-weight: 600; font-size: 1rem; }
-    .btn-logout { background: rgba(255,255,255,.15); color: white; border: 1px solid rgba(255,255,255,.3); border-radius: 8px; padding: 7px 14px; font-size: .85rem; cursor: pointer; }
-    .btn-logout:hover { background: rgba(255,255,255,.25); }
-    .btn-adm-device { background: rgba(255,255,255,.1); color: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.2); border-radius: 8px; padding: 7px 12px; font-size: .8rem; cursor: pointer; }
-    .btn-adm-device:hover { background: rgba(255,255,255,.2); }
-    .btn-adm-device.ativo { background: rgba(82,183,136,.3); border-color: #52B788; color: #B7E4C7; }
+    .adm-header {
+      background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);
+      padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      position: sticky; top: 0; z-index: 40;
+      box-shadow: 0 2px 20px rgba(0,0,0,.18);
+    }
+    .adm-header img { height: 50px; mix-blend-mode: screen; }
+    .adm-header-title { color: white; font-weight: 700; font-size: 1rem; letter-spacing: .01em; }
+    .btn-logout { background: rgba(255,255,255,.12); color: rgba(255,255,255,.85); border: 1px solid rgba(255,255,255,.22); border-radius: 9px; padding: 8px 16px; font-size: .84rem; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .btn-logout:hover { background: rgba(255,255,255,.22); }
+    .btn-adm-device { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.16); border-radius: 9px; padding: 8px 12px; font-size: .8rem; cursor: pointer; transition: background .15s; }
+    .btn-adm-device:hover { background: rgba(255,255,255,.18); }
+    .btn-adm-device.ativo { background: rgba(82,183,136,.28); border-color: rgba(82,183,136,.6); color: #B7E4C7; }
 
-    .adm-body { padding: 24px; max-width: 1200px; margin: 0 auto; }
+    .adm-body { padding: 28px; max-width: 1240px; margin: 0 auto; }
 
     /* ── STATS ── */
-    .stats-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
-    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 22px; flex: 1; min-width: 130px; }
-    .stat-num { font-family: 'Fraunces', Georgia, serif; font-size: 2rem; color: var(--forest); line-height: 1; font-variant-numeric: tabular-nums; }
-    .stat-label { font-size: .78rem; color: var(--muted); margin-top: 4px; }
+    .stats-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 26px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 20px 22px 18px; flex: 1; min-width: 130px; position: relative; overflow: hidden;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,.09); }
+    .stat-card::after {
+      content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px; border-radius: 16px 0 0 16px;
+    }
+    .stat-card:nth-child(1)::after { background: var(--amber); }
+    .stat-card:nth-child(2)::after { background: var(--amber-dk); }
+    .stat-card:nth-child(3)::after { background: var(--forest); }
+    .stat-card:nth-child(4)::after { background: var(--forest-mid); }
+    .stat-card:nth-child(5)::after { background: var(--green-light); }
+    .stat-card:nth-child(6)::after { background: var(--coral); }
+    .stat-icon { font-size: 1.3rem; margin-bottom: 10px; display: block; opacity: .7; }
+    .stat-num { font-family: 'Fraunces', Georgia, serif; font-size: 2.2rem; font-weight: 900; color: var(--forest); line-height: 1; font-variant-numeric: tabular-nums; }
+    .stat-label { font-size: .75rem; color: var(--muted); margin-top: 5px; font-weight: 500; }
 
     /* ── CHARTS ── */
     .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
@@ -83,16 +130,19 @@
     .btn-danger:hover { background: #fde8e4; }
 
     /* ── TABLE ── */
-    .table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); }
+    .table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,.04); }
     table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: .88rem; }
     thead tr { background: var(--surface-alt); }
-    th { padding: 11px 14px; text-align: left; font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap; }
+    th { padding: 12px 16px; text-align: left; font-size: .71rem; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); border-bottom: 2px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap; transition: color .15s; }
     th:hover { color: var(--forest); }
-    th .sort-arrow { opacity: .3; margin-left: 4px; }
+    th .sort-arrow { opacity: .25; margin-left: 4px; }
+    th.sorted { color: var(--forest); }
     th.sorted .sort-arrow { opacity: 1; }
-    td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    td { padding: 13px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; transition: background .1s; }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: var(--surface-alt); }
+    tbody tr { transition: background .12s; }
+    tbody tr:hover td { background: var(--leaf); }
+    tbody tr:hover td:first-child { box-shadow: inset 3px 0 0 var(--forest); }
 
     /* Status badge */
     .badge-status { display: inline-block; border-radius: 20px; padding: 3px 10px; font-size: .75rem; font-weight: 600; white-space: nowrap; }
@@ -148,14 +198,33 @@
     .badge-novo { display: inline-block; background: var(--coral); color: white; border-radius: 20px; padding: 2px 8px; font-size: .64rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-left: 6px; animation: pulse-novo 2s ease-in-out infinite; }
     @keyframes pulse-novo { 0%,100% { opacity:1; } 50% { opacity:.55; } }
 
-    /* ── ONLINE ── */
-    @keyframes pulsar { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(1.3); } }
-    .dot-online { background: #22c55e !important; animation: pulsar 1.5s ease-in-out infinite; }
-    .dot-vazio   { background: #94a3b8 !important; }
+    /* ── ONLINE BANNER ── */
+    .online-banner {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 13px 20px; margin-bottom: 20px;
+      font-size: .9rem; transition: border-color .4s, background .4s;
+    }
+    .online-banner.ativo { border-color: rgba(34,197,94,.5); background: rgba(34,197,94,.05); }
+    @keyframes pulsar { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(1.4); } }
+    .dot-online { width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0; animation: pulsar 1.5s ease-in-out infinite; }
+    .dot-vazio   { width:10px;height:10px;border-radius:50%;background:#94a3b8;flex-shrink:0; }
 
     /* ── TOAST ── */
-    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--forest); color: white; padding: 14px 20px; border-radius: 12px; font-size: .9rem; font-weight: 500; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 999; transform: translateY(80px); opacity: 0; transition: transform .3s ease, opacity .3s ease; }
-    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 999;
+      display: flex; align-items: center; gap: 12px;
+      background: var(--ink); color: white;
+      padding: 14px 20px; border-radius: 14px;
+      font-size: .9rem; font-weight: 500;
+      box-shadow: 0 12px 36px rgba(0,0,0,.28);
+      border-left: 4px solid var(--green-light);
+      transform: translateY(90px) scale(.96); opacity: 0;
+      transition: transform .3s cubic-bezier(.22,.68,0,1.2), opacity .25s ease;
+      max-width: 320px;
+    }
+    .toast.show { transform: translateY(0) scale(1); opacity: 1; }
+    .toast-icon { font-size: 1.1rem; flex-shrink: 0; }
 
     @media (max-width: 600px) { .adm-body { padding: 16px; } .stat-card { min-width: 110px; } .inp-busca { width: 100%; } }
   </style>
@@ -186,19 +255,19 @@
   <div class="adm-body">
 
     <!-- Online agora -->
-    <div id="online-banner" style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 18px;margin-bottom:18px;">
-      <span id="online-dot" style="width:10px;height:10px;border-radius:50%;background:#ccc;display:inline-block;flex-shrink:0"></span>
-      <span style="font-size:.92rem;color:var(--muted)">Verificando visitantes online...</span>
+    <div id="online-banner" class="online-banner">
+      <span id="online-dot" class="dot-vazio"></span>
+      <span id="online-texto" style="color:var(--muted)">Verificando visitantes online...</span>
     </div>
 
     <!-- Stats -->
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-num" id="stat-visitas">—</div><div class="stat-label">Visitas totais</div></div>
-      <div class="stat-card"><div class="stat-num" id="stat-visitas-hoje">—</div><div class="stat-label">Visitas hoje</div></div>
-      <div class="stat-card"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Total de cadastros</div></div>
-      <div class="stat-card"><div class="stat-num" id="stat-hoje">—</div><div class="stat-label">Cadastros hoje</div></div>
-      <div class="stat-card"><div class="stat-num" id="stat-aprovados">—</div><div class="stat-label">Aprovados</div></div>
-      <div class="stat-card"><div class="stat-num" id="stat-animal">—</div><div class="stat-label">Animal mais pedido</div></div>
+      <div class="stat-card"><span class="stat-icon">👁️</span><div class="stat-num" id="stat-visitas">—</div><div class="stat-label">Visitas totais</div></div>
+      <div class="stat-card"><span class="stat-icon">🌅</span><div class="stat-num" id="stat-visitas-hoje">—</div><div class="stat-label">Visitas hoje</div></div>
+      <div class="stat-card"><span class="stat-icon">📋</span><div class="stat-num" id="stat-total">—</div><div class="stat-label">Total de cadastros</div></div>
+      <div class="stat-card"><span class="stat-icon">✨</span><div class="stat-num" id="stat-hoje">—</div><div class="stat-label">Cadastros hoje</div></div>
+      <div class="stat-card"><span class="stat-icon">🐾</span><div class="stat-num" id="stat-aprovados">—</div><div class="stat-label">Aprovados</div></div>
+      <div class="stat-card"><span class="stat-icon">🏆</span><div class="stat-num" id="stat-animal">—</div><div class="stat-label">Animal mais pedido</div></div>
     </div>
 
     <!-- Gráficos -->
@@ -310,7 +379,7 @@
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast"><span class="toast-icon" id="toast-icon">✓</span><span id="toast-msg"></span></div>
 
 <script>
   const SUPABASE_URL = 'https://fuvsfrujnfgkpvvpimbx.supabase.co';
@@ -381,10 +450,24 @@
     renderStatsVisitas();
   }
 
+  function animarNum(el, target) {
+    if (typeof target !== 'number') { el.textContent = target; return; }
+    const from = parseInt(el.textContent) || 0;
+    if (from === target) return;
+    const dur = 700, t0 = performance.now();
+    const step = now => {
+      const p = Math.min((now - t0) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(from + (target - from) * ease);
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
   function renderStatsVisitas() {
-    document.getElementById('stat-visitas').textContent = visitasTodos.length;
+    animarNum(document.getElementById('stat-visitas'), visitasTodos.length);
     const hoje = new Date().toISOString().slice(0,10);
-    document.getElementById('stat-visitas-hoje').textContent = visitasTodos.filter(v => v.data?.startsWith(hoje)).length;
+    animarNum(document.getElementById('stat-visitas-hoje'), visitasTodos.filter(v => v.data?.startsWith(hoje)).length);
   }
 
   function aplicarFiltros() {
@@ -508,10 +591,10 @@
 
   function renderStats() {
     const t = dadosFiltrados.length;
-    document.getElementById('stat-total').textContent = t;
+    animarNum(document.getElementById('stat-total'), t);
     const hoje = new Date().toISOString().slice(0,10);
-    document.getElementById('stat-hoje').textContent = dadosFiltrados.filter(d => d.data?.startsWith(hoje)).length;
-    document.getElementById('stat-aprovados').textContent = dadosFiltrados.filter(d => d.status === 'Aprovado').length;
+    animarNum(document.getElementById('stat-hoje'), dadosFiltrados.filter(d => d.data?.startsWith(hoje)).length);
+    animarNum(document.getElementById('stat-aprovados'), dadosFiltrados.filter(d => d.status === 'Aprovado').length);
     const cont = {};
     dadosFiltrados.forEach(d => { if (d.animal && d.animal !== '—') cont[d.animal] = (cont[d.animal]||0)+1; });
     const top = Object.entries(cont).sort((a,b) => b[1]-a[1])[0];
@@ -594,7 +677,7 @@
     await db.from('cadastros').update({ status, historico_status: hist }).eq('id', id);
     if (c) { c.status = status; c.historico_status = hist; }
     renderStats();
-    mostrarToast(`Status: ${status}`);
+    mostrarToast(`Status: ${status}`, '↻');
   }
 
   function abrirModalObs(id, obs) {
@@ -641,7 +724,7 @@
     if (c) { c.observacoes = obs; c.tags = tags; }
     fecharModalObs();
     renderTabela();
-    mostrarToast('Salvo!');
+    mostrarToast('Salvo!', '✓');
   }
   document.getElementById('modal-obs').addEventListener('click', e => { if (e.target === e.currentTarget) fecharModalObs(); });
 
@@ -651,7 +734,7 @@
     dadosTodos = dadosTodos.filter(c => c.id !== id);
     aplicarFiltros();
     renderGraficos();
-    mostrarToast('Cadastro removido.');
+    mostrarToast('Cadastro removido.', '🗑');
   }
 
   async function limparTudo() {
@@ -683,7 +766,7 @@
     db.channel('cadastros-live')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'cadastros' }, payload => {
         carregarTabela();
-        mostrarToast('🐾 Novo cadastro recebido!');
+        mostrarToast('Novo cadastro recebido!', '🐾');
         try {
           if ('Notification' in window && Notification.permission === 'granted') {
             new Notification('🐾 Paraíso dos Focinhos', {
@@ -705,23 +788,25 @@
   function iniciarPresenca() {
     const canal = db.channel('presenca-site');
     canal.on('presence', { event: 'sync' }, () => {
-      const estado  = canal.presenceState();
-      const online  = Object.keys(estado).length;
+      const online  = Object.keys(canal.presenceState()).length;
       const dot     = document.getElementById('online-dot');
-      const banner  = document.getElementById('online-banner').querySelector('span:last-child');
+      const texto   = document.getElementById('online-texto');
+      const banner  = document.getElementById('online-banner');
       if (online > 0) {
         dot.className = 'dot-online';
-        banner.style.color = '#16a34a';
-        banner.style.fontWeight = '600';
-        banner.textContent = `🟢 ${online} pessoa${online > 1 ? 's' : ''} no site agora`;
+        banner.classList.add('ativo');
+        texto.style.color = '#16a34a';
+        texto.style.fontWeight = '600';
+        texto.textContent = `${online} pessoa${online > 1 ? 's' : ''} no site agora`;
       } else {
         dot.className = 'dot-vazio';
-        banner.style.color = 'var(--muted)';
-        banner.style.fontWeight = '400';
-        banner.textContent = 'Nenhuma pessoa no site agora';
+        banner.classList.remove('ativo');
+        texto.style.color = 'var(--muted)';
+        texto.style.fontWeight = '400';
+        texto.textContent = 'Nenhuma pessoa no site agora';
       }
     })
-    .subscribe(); // Admin só escuta, não rastreia presença
+    .subscribe();
   }
 
   // ── DISPOSITIVO ADMIN ──
@@ -736,10 +821,10 @@
     const isAdm = localStorage.getItem('pf_adm_device') === '1';
     if (isAdm) {
       localStorage.removeItem('pf_adm_device');
-      mostrarToast('Este dispositivo voltará a contar como visita.');
+      mostrarToast('Dispositivo voltará a contar como visita.', '↩');
     } else {
       localStorage.setItem('pf_adm_device', '1');
-      mostrarToast('✓ Este dispositivo não contará mais como visita.');
+      mostrarToast('Este dispositivo não contará mais como visita.', '🖥️');
     }
     atualizarBotaoDispositivo();
   }
@@ -780,9 +865,13 @@
     return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
   let toastTimer;
-  function mostrarToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
+  function mostrarToast(msg, icon = '✓') {
+    const t    = document.getElementById('toast');
+    const ico  = document.getElementById('toast-icon');
+    const txt  = document.getElementById('toast-msg');
+    if (ico) ico.textContent = icon;
+    if (txt) txt.textContent = msg; else t.textContent = msg;
+    t.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
   }
