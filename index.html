@@ -946,7 +946,7 @@ body {
     </div>
 
     <div style="text-align:center;margin-top:32px;">
-      <button class="btn-outros" onclick="window.open('https://wa.me/5521984207429','_blank')">
+      <button class="btn-outros" onclick="window.open('https://wa.me/5521984207429?text=' + encodeURIComponent('Olá, já fiz meu cadastro!'), '_blank')">
         Ver Outros Cães
       </button>
     </div>
@@ -987,7 +987,7 @@ body {
       </div>
 
       <div style="text-align:center;margin-top:32px;">
-        <button class="btn-outros" onclick="window.open('https://wa.me/5521984207429','_blank')">
+        <button class="btn-outros" onclick="window.open('https://wa.me/5521984207429?text=' + encodeURIComponent('Olá, já fiz meu cadastro!'), '_blank')">
           Ver Outros Gatos
         </button>
       </div>
@@ -1249,7 +1249,7 @@ body {
     helpBubble.hidden = true;
   });
   document.getElementById('btn-help-wa').addEventListener('click', function() {
-    window.open(`https://wa.me/${WA}`, '_blank');
+    window.open(`https://wa.me/${WA}?text=` + encodeURIComponent('Olá, já fiz meu cadastro!'), '_blank');
   });
   // Mostra a bolha após 2s ao carregar
   helpBubble.hidden = true;
@@ -1447,7 +1447,7 @@ body {
       if (contadorEl) contadorEl.textContent = seg;
       if (seg <= 0) {
         clearInterval(timer);
-        window.open(`https://wa.me/${WA}`, '_blank');
+        window.open(`https://wa.me/${WA}?text=` + encodeURIComponent('Olá, já fiz meu cadastro!'), '_blank');
       }
     }, 1000);
   }
