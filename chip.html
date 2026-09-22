@@ -163,24 +163,50 @@ body {
   box-shadow: 0 4px 24px rgba(0,0,0,.06);
 }
 @media (max-width: 520px) {
+  .chip-hero { padding: 24px 16px 32px; }
+  .chip-hero h1 { font-size: 2rem; }
+  .chip-hero p { font-size: 1rem; }
+
+  .main { padding-block: 16px 40px; padding-inline: 0; }
+
+  .info-box {
+    border-radius: 0; border-left: none; border-right: none;
+    margin-inline: 0; padding: 14px 16px;
+  }
+  .info-box p { font-size: 1rem; }
+
   .form-card {
-    padding: 20px 16px;
+    padding: 24px 16px;
     border-radius: 0;
-    border-left: none;
-    border-right: none;
+    border-left: none; border-right: none;
     box-shadow: none;
   }
-  .form-card h2 { font-size: 1.05rem; margin-bottom: 18px; }
-  .field { margin-bottom: 14px; }
-  .field label { font-size: .74rem; }
-  .field input, .field select, .field textarea { padding: 13px 12px; font-size: 1rem; }
-  .radio-group { max-width: 100%; gap: 8px; }
-  .radio-opt { padding: 10px 12px; }
-  .radio-opt-label { font-size: .82rem; }
-  .radio-item-hint { font-size: .78rem; padding: 8px 10px; }
-  .info-box { border-radius: 0; border-left: none; border-right: none; margin-inline: 0; }
-  .btn-submit { padding: 15px; font-size: .95rem; }
-  .form-divider { margin: 18px 0; }
+  .form-card h2 { font-size: 1.2rem; margin-bottom: 20px; }
+
+  .field { margin-bottom: 18px; }
+  .field label { font-size: .85rem; letter-spacing: .05em; }
+  .field input,
+  .field select,
+  .field textarea { padding: 15px 14px; font-size: 1.05rem; border-radius: 12px; }
+  .field-hint { font-size: .82rem; }
+
+  .radio-group { max-width: 100%; gap: 10px; }
+  .radio-item-hint { font-size: .9rem; padding: 10px 12px; }
+  .radio-opt { padding: 13px 14px; }
+  .radio-opt-label { font-size: .95rem; }
+  .radio-opt input[type="checkbox"] { width: 20px; height: 20px; }
+
+  .form-divider { margin: 20px 0; }
+  .btn-submit { padding: 17px; font-size: 1.05rem; border-radius: 14px; }
+
+  .success-card {
+    padding: 32px 16px;
+    border-radius: 0; border-left: none; border-right: none; box-shadow: none;
+  }
+  .success-card h2 { font-size: 1.4rem; }
+  .success-card .success-sub { font-size: .95rem; }
+  .prazo-dias { font-size: 2.2rem; }
+  .prazo-box p { font-size: .9rem; }
 }
 
 .form-card h2 {
