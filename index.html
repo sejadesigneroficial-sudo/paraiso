@@ -152,8 +152,24 @@ body {
   cursor: pointer; transition: all .15s;
 }
 .doe-val:hover { border-color: var(--amber); background: #FFF8ED; transform: translateY(-2px); }
+.doe-val.selecionado {
+  border-color: var(--amber); background: #FFF3DC;
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px rgba(244,162,40,.25);
+}
+.doe-val.selecionado strong { color: var(--amber-dk); }
 .doe-val strong { display: block; font-size: 1.3rem; font-weight: 800; color: var(--forest); }
 .doe-val span { font-size: .72rem; color: var(--muted); }
+.btn-confirmar-doe {
+  width: 100%; padding: 15px; background: linear-gradient(135deg, #F4A228, #D48810);
+  color: white; border: none; border-radius: 14px;
+  font-size: 1rem; font-weight: 800; cursor: pointer; letter-spacing: .03em;
+  box-shadow: 0 4px 16px rgba(244,162,40,.45);
+  transition: transform .15s, opacity .15s;
+  margin-top: 4px;
+}
+.btn-confirmar-doe:hover { transform: translateY(-2px); opacity: .92; }
+.btn-confirmar-doe[hidden] { display: none; }
 .btn-doe-outros {
   width: 100%; padding: 14px; border: 2px dashed var(--border);
   border-radius: 14px; background: transparent; color: var(--muted);
@@ -1071,25 +1087,26 @@ body {
       <h2>💚 Faça uma Doação</h2>
       <p>Sua contribuição ajuda a resgatar, tratar e encontrar lares para cães e gatos. Escolha um valor:</p>
       <div class="doe-valores">
-        <div class="doe-val" onclick="doareValor(5)">
+        <div class="doe-val" onclick="selecionarValor(5, this)">
           <strong>R$ 5</strong><span>Um gesto de amor</span>
         </div>
-        <div class="doe-val" onclick="doareValor(10)">
+        <div class="doe-val" onclick="selecionarValor(10, this)">
           <strong>R$ 10</strong><span>Ajuda com ração</span>
         </div>
-        <div class="doe-val" onclick="doareValor(20)">
+        <div class="doe-val" onclick="selecionarValor(20, this)">
           <strong>R$ 20</strong><span>Vacina preventiva</span>
         </div>
-        <div class="doe-val" onclick="doareValor(50)">
+        <div class="doe-val" onclick="selecionarValor(50, this)">
           <strong>R$ 50</strong><span>Consulta veterinária</span>
         </div>
-        <div class="doe-val" onclick="doareValor(100)">
+        <div class="doe-val" onclick="selecionarValor(100, this)">
           <strong>R$ 100</strong><span>Castração + vacinas</span>
         </div>
-        <div class="doe-val" onclick="doareValor(200)">
+        <div class="doe-val" onclick="selecionarValor(200, this)">
           <strong>R$ 200</strong><span>Padrinho do mês</span>
         </div>
       </div>
+      <button id="btn-confirmar-doe" class="btn-confirmar-doe" hidden onclick="confirmarDoacao()">✅ CONFIRMAR DOAÇÃO DE R$ <span id="confirmar-valor-label">0</span></button>
       <button class="btn-doe-outros" onclick="doareOutro()">💬 Outros valores — falar com a equipe</button>
       <button class="btn-fechar-doe" onclick="fecharDoacao()">Fechar</button>
     </div>
@@ -1547,11 +1564,30 @@ body {
     document.getElementById('modal-doe').hidden = true;
     voltarValores();
   }
+  let valorSelecionado = 0;
+
+  function selecionarValor(valor, el) {
+    document.querySelectorAll('.doe-val').forEach(c => c.classList.remove('selecionado'));
+    el.classList.add('selecionado');
+    valorSelecionado = valor;
+    const btn = document.getElementById('btn-confirmar-doe');
+    document.getElementById('confirmar-valor-label').textContent = valor;
+    btn.hidden = false;
+    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function confirmarDoacao() {
+    if (valorSelecionado > 0) doareValor(valorSelecionado);
+  }
+
   function voltarValores() {
     document.getElementById('doe-tela-valores').hidden = false;
     document.getElementById('doe-tela-loading').hidden = true;
     document.getElementById('doe-tela-pix').hidden     = true;
     document.getElementById('doe-tela-erro').hidden    = true;
+    document.getElementById('btn-confirmar-doe').hidden = true;
+    document.querySelectorAll('.doe-val').forEach(c => c.classList.remove('selecionado'));
+    valorSelecionado = 0;
   }
   function mostrarTela(tela) {
     ['valores','loading','pix','erro'].forEach(t =>
