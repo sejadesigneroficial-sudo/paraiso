@@ -51,6 +51,9 @@
     .adm-header-title { color: white; font-weight: 600; font-size: 1rem; }
     .btn-logout { background: rgba(255,255,255,.15); color: white; border: 1px solid rgba(255,255,255,.3); border-radius: 8px; padding: 7px 14px; font-size: .85rem; cursor: pointer; }
     .btn-logout:hover { background: rgba(255,255,255,.25); }
+    .btn-adm-device { background: rgba(255,255,255,.1); color: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.2); border-radius: 8px; padding: 7px 12px; font-size: .8rem; cursor: pointer; }
+    .btn-adm-device:hover { background: rgba(255,255,255,.2); }
+    .btn-adm-device.ativo { background: rgba(82,183,136,.3); border-color: #52B788; color: #B7E4C7; }
 
     .adm-body { padding: 24px; max-width: 1200px; margin: 0 auto; }
 
@@ -156,6 +159,7 @@
   <header class="adm-header">
     <img src="logo.png" alt="Paraíso dos Focinhos">
     <span class="adm-header-title">Painel de Cadastros</span>
+    <button class="btn-adm-device" id="btn-adm-device" onclick="toggleDispositivoAdm()" title="Marcar este navegador como administrativo (não conta visitas)">🖥️ Este dispositivo: <span id="adm-device-label">Visitante</span></button>
     <button class="btn-logout" onclick="logout()">Sair</button>
   </header>
 
@@ -287,6 +291,7 @@
       document.getElementById('pg-admin').style.display = 'block';
       carregarTabela();
       iniciarTempoReal();
+      atualizarBotaoDispositivo();
     } else {
       document.getElementById('inp-senha').classList.add('invalid');
       document.getElementById('login-erro').hidden = false;
@@ -563,6 +568,26 @@
         renderGraficos();
       })
       .subscribe();
+  }
+
+  // ── DISPOSITIVO ADMIN ──
+  function atualizarBotaoDispositivo() {
+    const isAdm = localStorage.getItem('pf_adm_device') === '1';
+    const btn   = document.getElementById('btn-adm-device');
+    const label = document.getElementById('adm-device-label');
+    label.textContent = isAdm ? 'Administrativo ✓' : 'Visitante';
+    btn.classList.toggle('ativo', isAdm);
+  }
+  function toggleDispositivoAdm() {
+    const isAdm = localStorage.getItem('pf_adm_device') === '1';
+    if (isAdm) {
+      localStorage.removeItem('pf_adm_device');
+      mostrarToast('Este dispositivo voltará a contar como visita.');
+    } else {
+      localStorage.setItem('pf_adm_device', '1');
+      mostrarToast('✓ Este dispositivo não contará mais como visita.');
+    }
+    atualizarBotaoDispositivo();
   }
 
   // ── UTILS ──

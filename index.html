@@ -954,9 +954,10 @@ body {
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // Contador de visitas — registra uma vez por sessão
+  // Contador de visitas — ignora dispositivos administrativos
   (function registrarVisita() {
     try {
+      if (localStorage.getItem('pf_adm_device') === '1') return;
       if (!sessionStorage.getItem('pf_visita')) {
         db.from('visitas').insert({}).then(() => {});
         sessionStorage.setItem('pf_visita', '1');
