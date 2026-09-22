@@ -954,6 +954,16 @@ body {
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  // Contador de visitas — registra uma vez por sessão
+  (function registrarVisita() {
+    try {
+      if (!sessionStorage.getItem('pf_visita')) {
+        db.from('visitas').insert({}).then(() => {});
+        sessionStorage.setItem('pf_visita', '1');
+      }
+    } catch(e) {}
+  })();
+
   // Tab switch
   function switchTab(tab) {
     document.getElementById('panel-caes').hidden  = tab !== 'caes';

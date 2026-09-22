@@ -163,6 +163,8 @@
 
     <!-- Stats -->
     <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="stat-visitas">—</div><div class="stat-label">Visitas totais</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-visitas-hoje">—</div><div class="stat-label">Visitas hoje</div></div>
       <div class="stat-card"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Total de cadastros</div></div>
       <div class="stat-card"><div class="stat-num" id="stat-hoje">—</div><div class="stat-label">Cadastros hoje</div></div>
       <div class="stat-card"><div class="stat-num" id="stat-aprovados">—</div><div class="stat-label">Aprovados</div></div>
@@ -261,6 +263,7 @@
 
   let dadosTodos = [];
   let dadosFiltrados = [];
+  let visitasTodos = [];
   let paginaAtual = 1;
   let sortColuna = 'id';
   let sortAsc = false;
@@ -300,11 +303,21 @@
 
   // ── DADOS ──
   async function carregarTabela() {
-    const { data, error } = await db.from('cadastros').select('*').order('id', { ascending: false });
-    if (error) { console.error(error); return; }
-    dadosTodos = data || [];
+    const [{ data: cads }, { data: visits }] = await Promise.all([
+      db.from('cadastros').select('*').order('id', { ascending: false }),
+      db.from('visitas').select('id, data').order('id', { ascending: false })
+    ]);
+    dadosTodos   = cads   || [];
+    visitasTodos = visits || [];
     aplicarFiltros();
     renderGraficos();
+    renderStatsVisitas();
+  }
+
+  function renderStatsVisitas() {
+    document.getElementById('stat-visitas').textContent = visitasTodos.length;
+    const hoje = new Date().toISOString().slice(0,10);
+    document.getElementById('stat-visitas-hoje').textContent = visitasTodos.filter(v => v.data?.startsWith(hoje)).length;
   }
 
   function aplicarFiltros() {
@@ -446,20 +459,26 @@
 
   // ── GRÁFICOS ──
   function renderGraficos() {
-    // Últimos 7 dias
-    const dias = [];
-    const counts = [];
+    // Últimos 7 dias — visitas + cadastros
+    const dias = [], cntCads = [], cntVisitas = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date(); d.setDate(d.getDate() - i);
       const key = d.toISOString().slice(0,10);
       dias.push(d.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric' }));
-      counts.push(dadosTodos.filter(c => c.data?.startsWith(key)).length);
+      cntCads.push(dadosTodos.filter(c => c.data?.startsWith(key)).length);
+      cntVisitas.push(visitasTodos.filter(v => v.data?.startsWith(key)).length);
     }
     if (chartDias) chartDias.destroy();
     chartDias = new Chart(document.getElementById('chart-dias'), {
       type: 'bar',
-      data: { labels: dias, datasets: [{ label: 'Cadastros', data: counts, backgroundColor: '#52B788', borderRadius: 6 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+      data: {
+        labels: dias,
+        datasets: [
+          { label: 'Visitas',    data: cntVisitas, backgroundColor: '#74C69D', borderRadius: 4 },
+          { label: 'Cadastros',  data: cntCads,    backgroundColor: '#1B4332', borderRadius: 4 }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12 } } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { stacked: false } } }
     });
 
     // Animais
@@ -534,10 +553,16 @@
   // ── TEMPO REAL ──
   function iniciarTempoReal() {
     db.channel('cadastros-live')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'cadastros' }, () => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'cadastros' }, () => {
         carregarTabela();
         mostrarToast('🐾 Novo cadastro recebido!');
-      }).subscribe();
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'visitas' }, payload => {
+        visitasTodos.unshift(payload.new);
+        renderStatsVisitas();
+        renderGraficos();
+      })
+      .subscribe();
   }
 
   // ── UTILS ──
