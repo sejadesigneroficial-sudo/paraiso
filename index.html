@@ -1224,4 +1224,18 @@ body {
       if (this.value.trim()) this.classList.remove('invalid');
     });
   });
+
+  document.getElementById('f-animal').addEventListener('change', function() {
+    const nome = this.value;
+    if (!nome) {
+      document.getElementById('animal-selecionado').hidden = true;
+      animalEscolhido = '';
+      return;
+    }
+    animalEscolhido = nome;
+    document.getElementById('animal-nome').textContent = nome;
+    const previewImg = document.getElementById('animal-preview-img');
+    if (previewImg && ANIMAL_IMGS[nome]) { previewImg.src = ANIMAL_IMGS[nome]; previewImg.alt = nome; }
+    document.getElementById('animal-selecionado').hidden = false;
+  });
 </script>
