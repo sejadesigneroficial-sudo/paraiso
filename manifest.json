@@ -1,0 +1,14 @@
+{
+  "name": "Paraíso dos Focinhos",
+  "short_name": "Paraíso",
+  "description": "Adoção responsável de cães e gatos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#EFF5ED",
+  "theme_color": "#1B4332",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

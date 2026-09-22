@@ -133,6 +133,17 @@
     .btn-save-obs:hover { background: var(--forest-mid); }
     .btn-cancel-obs { padding: 10px 16px; background: transparent; border: 1.5px solid var(--border); border-radius: 9px; font-size: .9rem; cursor: pointer; color: var(--muted); }
 
+    /* ── TAGS ── */
+    .tag-chip { display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 20px; font-size: .78rem; font-weight: 600; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; transition: all .15s; white-space: nowrap; }
+    .tag-chip:hover { border-color: var(--forest-mid); color: var(--forest); }
+    .tag-chip.ativa { background: var(--leaf); border-color: var(--forest); color: var(--forest); }
+    .tag-chip-sm { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: .67rem; font-weight: 600; background: var(--leaf); color: var(--forest); border: 1px solid var(--border); white-space: nowrap; }
+    .tags-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+    .modal-section-label { display: block; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 8px; }
+    .historico-item { display: flex; align-items: center; gap: 8px; font-size: .8rem; color: var(--muted); padding: 5px 0; border-bottom: 1px solid var(--border); }
+    .historico-item:last-child { border-bottom: none; }
+    .historico-para { color: var(--ink); font-weight: 600; }
+
     /* ── NOVO badge ── */
     .badge-novo { display: inline-block; background: var(--coral); color: white; border-radius: 20px; padding: 2px 8px; font-size: .64rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; margin-left: 6px; animation: pulse-novo 2s ease-in-out infinite; }
     @keyframes pulse-novo { 0%,100% { opacity:1; } 50% { opacity:.55; } }
@@ -231,7 +242,13 @@
         <option value="hoje">Hoje</option>
         <option value="semana">Esta semana</option>
         <option value="mes">Este mês</option>
+        <option value="range">Intervalo...</option>
       </select>
+      <div id="range-wrap" style="display:none;gap:6px;align-items:center">
+        <input type="date" class="sel-filtro" id="fil-de"  onchange="aplicarFiltros()" style="width:auto">
+        <span style="color:var(--muted);font-size:.85rem">até</span>
+        <input type="date" class="sel-filtro" id="fil-ate" onchange="aplicarFiltros()" style="width:auto">
+      </div>
       <button class="btn-icon" onclick="carregarTabela()">↻ Atualizar</button>
       <button class="btn-icon" onclick="exportarCSV()">⬇ CSV</button>
       <button class="btn-icon btn-danger" onclick="limparTudo()">Limpar tudo</button>
@@ -263,11 +280,29 @@
   </div>
 </div>
 
-<!-- Modal de Observações -->
+<!-- Modal — Observações + Tags + Histórico -->
 <div class="modal-obs" id="modal-obs" hidden>
   <div class="modal-obs-inner">
-    <h3>Observações</h3>
+    <h3 id="modal-obs-titulo">Observações</h3>
+
+    <label class="modal-section-label" style="margin-top:6px">Tags</label>
+    <div class="tags-grid" id="tags-chips">
+      <button class="tag-chip" data-tag="Urgente"             onclick="toggleTag(this)">🔴 Urgente</button>
+      <button class="tag-chip" data-tag="Visita agendada"     onclick="toggleTag(this)">📅 Visita agendada</button>
+      <button class="tag-chip" data-tag="Aguardando docs"     onclick="toggleTag(this)">📄 Aguardando docs</button>
+      <button class="tag-chip" data-tag="Família c/ crianças" onclick="toggleTag(this)">👶 Família c/ crianças</button>
+      <button class="tag-chip" data-tag="Apartamento"         onclick="toggleTag(this)">🏢 Apartamento</button>
+      <button class="tag-chip" data-tag="Casa c/ quintal"     onclick="toggleTag(this)">🏡 Casa c/ quintal</button>
+    </div>
+
+    <label class="modal-section-label" style="margin-top:16px">Observações</label>
     <textarea id="obs-textarea" placeholder="Adicione notas sobre este cadastro..."></textarea>
+
+    <div id="historico-wrap" hidden style="margin-top:14px">
+      <label class="modal-section-label">Histórico de status</label>
+      <div id="historico-lista"></div>
+    </div>
+
     <div class="modal-obs-btns">
       <button class="btn-cancel-obs" onclick="fecharModalObs()">Cancelar</button>
       <button class="btn-save-obs" onclick="salvarObs()">Salvar</button>
@@ -356,8 +391,10 @@
     const busca   = document.getElementById('inp-busca').value.toLowerCase();
     const status  = document.getElementById('fil-status').value;
     const animal  = document.getElementById('fil-animal').value;
-    const periodo = document.getElementById('fil-periodo').value;
-    const agora   = new Date();
+    const periodo   = document.getElementById('fil-periodo').value;
+    const agora     = new Date();
+    const rangeWrap = document.getElementById('range-wrap');
+    if (rangeWrap) rangeWrap.style.display = periodo === 'range' ? 'flex' : 'none';
 
     dadosFiltrados = dadosTodos.filter(c => {
       const okBusca  = !busca  || c.nome?.toLowerCase().includes(busca) || c.whatsapp?.includes(busca);
@@ -370,7 +407,14 @@
         else if (periodo === 'semana') {
           const s = new Date(agora); s.setDate(agora.getDate() - agora.getDay()); s.setHours(0,0,0,0);
           okPeriodo = d >= s;
-        } else if (periodo === 'mes') okPeriodo = d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+        } else if (periodo === 'mes') {
+          okPeriodo = d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+        } else if (periodo === 'range') {
+          const de  = document.getElementById('fil-de').value;
+          const ate = document.getElementById('fil-ate').value;
+          if (de)  okPeriodo = okPeriodo && d >= new Date(de  + 'T00:00:00');
+          if (ate) okPeriodo = okPeriodo && d <= new Date(ate + 'T23:59:59');
+        }
       }
       return okBusca && okStatus && okAnimal && okPeriodo;
     });
@@ -424,12 +468,15 @@
       const tel = String(c.whatsapp || '').replace(/\D/g,'');
       const msg = encodeURIComponent(`Olá ${c.nome}! 🐾 Somos do PARAISO DOS FOCINHOS. Recebemos seu interesse em adotar um(a) ${c.animal || 'animal'} e gostaríamos de dar continuidade ao seu cadastro. Podemos conversar?`);
       const statusClass = { 'Aguardando':'s-aguardando','Em contato':'s-contato','Aprovado':'s-aprovado','Recusado':'s-recusado' }[c.status] || 's-aguardando';
-      const isNovo = c.data && c.data > ultimaVisitaAdmin;
+      const isNovo   = c.data && c.data > ultimaVisitaAdmin;
+      const tagsArr  = c.tags ? c.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+      const tagsHtml = tagsArr.length ? `<br><span style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">${tagsArr.map(t => `<span class="tag-chip-sm">${esc(t)}</span>`).join('')}</span>` : '';
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="color:var(--muted);font-size:.8rem;font-variant-numeric:tabular-nums">${num}</td>
         <td>
           <strong>${esc(c.nome)}</strong>${isNovo ? '<span class="badge-novo">Novo</span>' : ''}
+          ${tagsHtml}
           ${c.observacoes ? `<br><span style="font-size:.76rem;color:var(--muted);font-style:italic">${esc(c.observacoes.slice(0,50))}${c.observacoes.length>50?'…':''}</span>` : ''}
         </td>
         <td style="color:var(--muted);font-size:.82rem;max-width:180px">${esc(c.endereco)}</td>
@@ -541,27 +588,60 @@
 
   // ── AÇÕES ──
   async function alterarStatus(id, status) {
-    await db.from('cadastros').update({ status }).eq('id', id);
-    const c = dadosTodos.find(x => x.id === id);
-    if (c) c.status = status;
+    const c    = dadosTodos.find(x => x.id === id);
+    const hist = c?.historico_status ? [...c.historico_status] : [];
+    hist.push({ de: c?.status || 'Aguardando', para: status, data: new Date().toISOString() });
+    await db.from('cadastros').update({ status, historico_status: hist }).eq('id', id);
+    if (c) { c.status = status; c.historico_status = hist; }
     renderStats();
-    mostrarToast(`Status atualizado: ${status}`);
+    mostrarToast(`Status: ${status}`);
   }
 
   function abrirModalObs(id, obs) {
     obsIdAtual = id;
+    const c = dadosTodos.find(x => x.id === id);
+    document.getElementById('modal-obs-titulo').textContent = c ? c.nome : 'Observações';
     document.getElementById('obs-textarea').value = obs || '';
+
+    // Tags
+    const tagsAtivas = c?.tags ? c.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+    document.querySelectorAll('#tags-chips .tag-chip').forEach(btn => {
+      btn.classList.toggle('ativa', tagsAtivas.includes(btn.dataset.tag));
+    });
+
+    // Histórico
+    const hist = c?.historico_status || [];
+    const histWrap  = document.getElementById('historico-wrap');
+    const histLista = document.getElementById('historico-lista');
+    if (hist.length) {
+      histWrap.hidden = false;
+      histLista.innerHTML = [...hist].reverse().map(h =>
+        `<div class="historico-item">
+          <span>${new Date(h.data).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
+          <span style="color:var(--muted)">→</span>
+          <span class="historico-para">${esc(h.para)}</span>
+        </div>`
+      ).join('');
+    } else {
+      histWrap.hidden = true;
+    }
+
     document.getElementById('modal-obs').hidden = false;
   }
+
+  function toggleTag(btn) { btn.classList.toggle('ativa'); }
+
   function fecharModalObs() { document.getElementById('modal-obs').hidden = true; obsIdAtual = null; }
+
   async function salvarObs() {
-    const obs = document.getElementById('obs-textarea').value.trim();
-    await db.from('cadastros').update({ observacoes: obs }).eq('id', obsIdAtual);
+    const obs  = document.getElementById('obs-textarea').value.trim();
+    const tags = [...document.querySelectorAll('#tags-chips .tag-chip.ativa')].map(b => b.dataset.tag).join(',');
+    await db.from('cadastros').update({ observacoes: obs, tags }).eq('id', obsIdAtual);
     const c = dadosTodos.find(x => x.id === obsIdAtual);
-    if (c) c.observacoes = obs;
+    if (c) { c.observacoes = obs; c.tags = tags; }
     fecharModalObs();
     renderTabela();
-    mostrarToast('Observação salva!');
+    mostrarToast('Salvo!');
   }
   document.getElementById('modal-obs').addEventListener('click', e => { if (e.target === e.currentTarget) fecharModalObs(); });
 

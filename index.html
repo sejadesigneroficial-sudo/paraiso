@@ -14,7 +14,10 @@
 <meta name="twitter:description" content="Um amigo para a vida toda espera por você. Cães e gatos disponíveis para adoção.">
 <meta name="twitter:image" content="https://paraisodosfocinhos.online/chihuahua.png">
 <link rel="canonical" href="https://paraisodosfocinhos.online/">
+<meta name="theme-color" content="#1B4332">
+<link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="logo.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -553,6 +556,21 @@ body {
 }
 .btn-cancel:hover { color: var(--ink); background: var(--surface-alt); }
 
+/* TAB COUNTER */
+.ftab-count { background: var(--border); color: var(--muted); border-radius: 20px; padding: 2px 8px; font-size: .72rem; font-weight: 700; transition: background .15s, color .15s; }
+.ftab.active .ftab-count { background: rgba(255,255,255,.25); color: white; }
+
+/* SOBRE A ONG */
+.sobre { background: var(--surface); padding: 60px 16px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.sobre-inner { max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 52px; align-items: center; }
+@media (max-width: 680px) { .sobre-inner { grid-template-columns: 1fr; gap: 32px; } }
+.sobre-text h2 { font-family: 'Fraunces', Georgia, serif; font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 900; color: var(--ink); margin: 0 0 16px; line-height: 1.2; text-wrap: balance; }
+.sobre-text p { color: var(--muted); font-size: .95rem; line-height: 1.7; margin: 0 0 10px; }
+.sobre-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.sobre-stat { background: var(--bg); border-radius: 14px; padding: 20px 12px; text-align: center; border: 1px solid var(--border); }
+.sobre-stat-num { font-family: 'Fraunces', Georgia, serif; font-size: 2rem; font-weight: 900; color: var(--forest); line-height: 1; margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+.sobre-stat-label { font-size: .72rem; color: var(--muted); line-height: 1.35; }
+
 /* ANIMAL PREVIEW NO FORMULÁRIO */
 .form-animal-preview {
   display: flex;
@@ -751,11 +769,11 @@ body {
     <div class="filter-tabs">
       <button class="ftab active" id="tab-caes" onclick="switchTab('caes')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm15 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM7 7a1.5 1.5 0 100-3A1.5 1.5 0 007 7zm10 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM12 22c-4 0-8-2.5-8-7 0-1.5.5-3 1.5-4.2C6.5 9.5 8 9 9 9h6c1 0 2.5.5 3.5 1.8C19.5 12 20 13.5 20 15c0 4.5-4 7-8 7z"/></svg>
-        Cães
+        Cães <span class="ftab-count">8</span>
       </button>
       <button class="ftab" id="tab-gatos" onclick="switchTab('gatos')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8l5 4-3 4zm4-6l-2-1.5V7h2v3z"/></svg>
-        Gatos
+        Gatos <span class="ftab-count">4</span>
       </button>
     </div>
 
@@ -875,6 +893,32 @@ body {
       </div>
     </div><!-- /panel-gatos -->
 
+  </section>
+
+  <!-- SOBRE A ONG -->
+  <section class="sobre">
+    <div class="sobre-inner">
+      <div class="sobre-text">
+        <p class="sec-eyebrow" style="text-align:left;margin-bottom:10px;">Nossa missão</p>
+        <h2>Cada focinho merece um lar cheio de amor</h2>
+        <p>O PARAÍSO DOS FOCINHOS é uma ONG dedicada a encontrar famílias amorosas para cães e gatos. Resgatamos, cuidamos e facilitamos o processo de adoção responsável, transformando vidas — tanto dos animais quanto das famílias.</p>
+        <p style="font-size:.83rem;margin:0">CNPJ 19.614.984/0001-29 &nbsp;·&nbsp; Rio de Janeiro — RJ</p>
+      </div>
+      <div class="sobre-stats">
+        <div class="sobre-stat">
+          <div class="sobre-stat-num" id="stat-pub-adotados">—</div>
+          <div class="sobre-stat-label">Adoções realizadas</div>
+        </div>
+        <div class="sobre-stat">
+          <div class="sobre-stat-num">12</div>
+          <div class="sobre-stat-label">Raças disponíveis</div>
+        </div>
+        <div class="sobre-stat">
+          <div class="sobre-stat-num" id="stat-pub-visitas">—</div>
+          <div class="sobre-stat-label">Visitantes no site</div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <section class="cta-band">
@@ -1208,6 +1252,12 @@ body {
     document.getElementById('form-sucesso').hidden = false;
     document.getElementById('animal-selecionado').hidden = true;
     window.open(`https://wa.me/${WA}`, '_blank');
+    try {
+      confetti({ particleCount: 140, spread: 85, origin: { y: 0.55 },
+        colors: ['#1B4332','#52B788','#F4A228','#E05C3A','#ffffff','#D8F3DC','#95D5B2'] });
+      setTimeout(() => confetti({ particleCount: 60, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors: ['#F4A228','#52B788'] }), 320);
+      setTimeout(() => confetti({ particleCount: 60, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors: ['#E05C3A','#1B4332'] }), 320);
+    } catch(e) {}
   }
 
   ['f-name','f-addr','f-wa'].forEach(id => {
@@ -1215,6 +1265,25 @@ body {
       if (this.value.trim()) this.classList.remove('invalid');
     });
   });
+
+  // Estatísticas para seção Sobre
+  (async function carregarStatsSobre() {
+    try {
+      const [r1, r2] = await Promise.all([
+        db.from('cadastros').select('id', { count: 'exact', head: true }).eq('status', 'Aprovado'),
+        db.from('visitas').select('id', { count: 'exact', head: true })
+      ]);
+      const elA = document.getElementById('stat-pub-adotados');
+      const elV = document.getElementById('stat-pub-visitas');
+      if (elA) elA.textContent = r1.count ?? 0;
+      if (elV) elV.textContent = r2.count ?? 0;
+    } catch(e) {}
+  })();
+
+  // PWA — registra service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
 
   document.getElementById('f-animal').addEventListener('change', function() {
     const nome = this.value;
