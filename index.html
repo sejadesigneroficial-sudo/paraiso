@@ -1225,12 +1225,6 @@ body {
             </select>
             <span class="field-error">Selecione um animal</span>
           </div>
-          <label class="check-req" id="label-req">
-            <input type="checkbox" id="chk-req">
-            <span>Declaro que li e atendo a todos os requisitos acima e tenho condições de oferecer um lar responsável ao animal.</span>
-          </label>
-          <p class="check-req-error" id="erro-req">Você precisa confirmar que atende aos requisitos para continuar.</p>
-
           <button type="submit" class="btn-submit" id="btn-submit-form">Enviar Cadastro</button>
           <p id="erro-envio" style="display:none;color:#E05C3A;font-size:.85rem;text-align:center;margin-top:10px;font-weight:600">❌ Erro ao enviar. Verifique sua internet e tente novamente.</p>
         </form>
@@ -1472,22 +1466,9 @@ body {
     if (waDigits.length < 10) { waEl.classList.add('invalid'); valid = false; }
     else waEl.classList.remove('invalid');
 
-    const chkReq  = document.getElementById('chk-req');
-    const erroReq = document.getElementById('erro-req');
-    const labelReq = document.getElementById('label-req');
-    if (!chkReq.checked) {
-      labelReq.classList.add('invalid');
-      erroReq.classList.add('show');
-      valid = false;
-    } else {
-      labelReq.classList.remove('invalid');
-      erroReq.classList.remove('show');
-    }
-
     if (!valid) {
       const inv = document.querySelector('.field input.invalid, .field select.invalid');
       if (inv) inv.focus();
-      else if (!chkReq.checked) chkReq.focus();
       return;
     }
 
