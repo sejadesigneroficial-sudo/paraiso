@@ -1231,7 +1231,8 @@ body {
           </label>
           <p class="check-req-error" id="erro-req">Você precisa confirmar que atende aos requisitos para continuar.</p>
 
-          <button type="submit" class="btn-submit">Enviar Cadastro</button>
+          <button type="submit" class="btn-submit" id="btn-submit-form">Enviar Cadastro</button>
+          <p id="erro-envio" style="display:none;color:#E05C3A;font-size:.85rem;text-align:center;margin-top:10px;font-weight:600">❌ Erro ao enviar. Verifique sua internet e tente novamente.</p>
         </form>
 
         <!-- Sucesso -->
@@ -1490,6 +1491,12 @@ body {
       return;
     }
 
+    // Bloqueia botão durante envio
+    const btnSubmit = document.getElementById('btn-submit-form');
+    const erroEnvio = document.getElementById('erro-envio');
+    if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.textContent = 'Enviando...'; }
+    if (erroEnvio) erroEnvio.style.display = 'none';
+
     // Salva no Supabase
     const { error: errInsert } = await db.from('cadastros').insert({
       nome: name,
@@ -1498,8 +1505,12 @@ body {
       animal: animal,
       data: new Date().toISOString()
     });
+
     if (errInsert) {
       console.error('Erro Supabase:', errInsert.message);
+      if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.textContent = 'Enviar Cadastro'; }
+      if (erroEnvio) erroEnvio.style.display = 'block';
+      return;
     }
 
     // Mostra tela de sucesso e abre WhatsApp simultaneamente
